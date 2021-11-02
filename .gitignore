@@ -1,0 +1,5 @@
+__*
+venv
+.idea
+settings.py
+database.sqlite
