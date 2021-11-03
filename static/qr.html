@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DU Attend v2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+            integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="qr.js"></script>
+    <style>
+        body {
+            font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+        }
+
+        .f18 {
+            font-size: 1.8em;
+        }
+
+        .copyleft {
+            margin-top: 1em;
+            font-size: 0.8em;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <h1 style="text-align: center;">강의실 추가</h1>
+    <hr>
+
+    <div class="f18" style="margin-top: 1em; margin-bottom: 1em; text-align: center;">
+        <span style="font-weight: bold" id="alert" >카메라 권한을 허용해 주세요!</span>
+    </div>
+
+    <div id="reader" style="margin-top: 1em; margin-bottom: 2em">
+
+    </div>
+
+    <div style="text-align: center; margin-bottom: 1em; display: none;" id="classRoomNameDiv">
+        <span class="f18"><span id="classRoomName" style="font-weight: bold"></span> 강의실 <br>→ </span>
+        <a href="#" class="f18" onclick="change_classroom_name()">이름 변경</a>
+    </div>
+    <!--    <div style="width: 100%; text-align:center ;">-->
+    <!--        <input type="text" style="margin-right: auto;margin-left: auto; width: auto" placeholder="강의실 이름을 입력하세요" aria-describedby="강의실 이름을 입력하세요."-->
+    <!--               aria-labelledby="강의실 이름을 입력하세요.">-->
+    <!--    </div>-->
+
+    <div>
+        <button id="save_btn" onclick="save()" style="width: 100%; display: none">강의실 저장</button>
+    </div>
+</div>
+
+<hr>
+
+<div class="copyleft">
+    <span>2021. <a href="https://works.miscthings.net">MiscThings</a></span>
+</div>
+
+<script>
+    let current_html5QRCode = undefined;
+    let cameraList = [];
+    let classroomName = "";
+    let qrCodeData = "";
+    let SERVER_ADDRESS = "//attend.miscthings.net/"
+
+    function change_classroom_name(){
+        classroomName = prompt("강의실 이름을 입력해주세요.", classroomName);
+        $("#classRoomName").html(classroomName);
+    }
+
+    function detect_api_server() {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                url: "/7qy38tiejfkdnojiwgu9eyhijdfk",
+                success: function (data) {
+                    console.log("Hello api server!")
+                    SERVER_ADDRESS = "/"
+                    resolve()
+                },
+                error: function (xhr, status, err) {
+                    resolve()
+                },
+                timeout: 500
+            });
+        })
+    }
+
+    function classroom_data(push, data) {
+        let type = 0
+        if(push){
+            type = 1
+        }
+        if(!data){
+            data = ""
+        }
+
+        return new Promise(function (resolve, reject) {
+            if(localStorage.getItem("login_id") && localStorage.getItem("password")){
+                $.ajax({
+                    method: "POST",
+                    url: SERVER_ADDRESS + "account/action",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({
+                        std_id: localStorage.getItem("login_id"),
+                        password: localStorage.getItem("password"),
+                        type: type,
+                        data: data,
+                        account_register: false
+                    }),
+                    success: function (data) {
+                        if (!data.success) {
+                            window.location = "login.html"
+                        }
+
+                        $(".login_id").each(function() {
+                            $(this).html(localStorage.getItem("login_id"))
+                        })
+
+                        resolve(data.data)
+                    },
+                });
+            }else{
+                window.location = "login.html"
+            }
+        })
+    }
+
+    async function save(){
+        let savebtn = $("#save_btn")
+
+        savebtn.attr("disabled", true)
+
+        savebtn.html("서버에서 데이터 가져오는 중...")
+        let clsdata = await classroom_data();
+        try {
+            clsdata = JSON.parse(clsdata);
+        }catch (e) {
+            console.log("디코드에 실패했습니다...", {clsdata})
+            clsdata = []
+        }
+
+        clsdata.push({
+            "qr_string": qrCodeData,
+            "name": classroomName,
+        })
+
+        savebtn.html("저장 중...")
+        await classroom_data(1, JSON.stringify(clsdata));
+
+        window.location = "index.html"
+    }
+
+    $(document).ready(async function () {
+        await detect_api_server();
+        await classroom_data();
+        addFromQR();
+    })
+
+    function alertText(id, lv, text) {
+        $(id).html(text)
+    }
+
+    Array.prototype.swap = function (a, b) {
+        let temp = this[a];
+        this[a] = this[b];
+        this[b] = temp;
+    };
+
+    function doneReadQR(){
+        $("#reader").html(`<button style="width: 100%;" onclick="addFromQR();">다시 인식하기</button>`)
+    }
+
+    async function addFromQR() {
+        alertText('#alert', 'warning', "카메라 권한을 허용해 주십시오.");
+
+        if (!cameraList.length) {
+            cameraList = await getCameraList();
+            sortCamera();
+        }
+
+        if (!cameraList.length) {
+            console.log("사용 가능한 카메라가 없습니다.");
+
+            alertText('#alert', 'danger', "사용 가능한 카메라가 없거나 차단되었습니다.");
+
+            $('#addQRBtn').attr('disabled', true);
+            return;
+        }
+
+
+        alertText('#alert', 'info', "QR코드를 인식시켜 주십시오.");
+        let result = await captureQRData(cameraList[0].id);
+        qrCodeData = result
+        classroomName = result.substr(0, 4);
+
+        $("#classRoomNameDiv").show();
+        $("#save_btn").show();
+        $("#classRoomName").html(classroomName);
+
+        doneReadQR();
+        // addClassroom(result.sid, result.tid, `${result.tid} 강의실`);
+    }
+
+    function getCameraList() {
+        return new Promise(function (resolve, reject) {
+            Html5Qrcode.getCameras().then(devices => {
+                /**
+                 * devices would be an array of objects of type:
+                 * { id: "id", label: "label" }
+                 */
+                if (devices && devices.length) {
+                    resolve(devices)
+                } else {
+                    resolve([])
+                }
+            }).catch(err => {
+                resolve([]);
+            });
+        });
+    }
+
+    function sortCamera() {
+        for (let i = 0; i < cameraList.length; i++) {
+            if (cameraList[i].label.includes("0, facing back")) {
+                cameraList.swap(i, 0)
+                break;
+            }
+
+            if (cameraList[i].label.includes("후면 카메라")) {
+                cameraList.swap(i, 0)
+                break;
+            }
+        }
+    }
+
+    function checkQRData(data) {
+        return /\b[0-9a-fA-F]{31,65}\b/.test(data)
+    }
+
+    function captureQRData(cid) {
+        return new Promise(function (resolve, reject) {
+            const html5QrCode = new Html5Qrcode("reader");
+            current_html5QRCode = html5QrCode;
+            html5QrCode.start(
+                cid,
+                {
+                    fps: 29,    // Optional frame per seconds for qr code scanning
+                    // qrbox: 250  // Optional if you want bounded box UI
+                },
+                qrCodeMessage => {
+                    // do something when code is read
+                    // $('#hit').append('<p>' + qrCodeMessage + '</p>');
+                    if (checkQRData(qrCodeMessage)) {
+                        alertText('#alert', 'success', "인식이 완료되었습니다. ");
+                        html5QrCode.stop();
+                        resolve(qrCodeMessage)
+                    } else {
+                        alertText('#alert', 'warning', "올바른 QR코드가 아닙니다. ");
+                    }
+                },
+                errorMessage => {
+                    // parse error, ignore it.
+                    // console.log(errorMessage)
+                })
+                .catch(err => {
+                    alert(err)
+                    html5QrCode.stop();
+                });
+        })
+    }
+</script>
+
+</body>
+</html>

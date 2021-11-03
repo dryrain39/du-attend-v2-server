@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DU Attend v2</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+            integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+        }
+
+        .f18 {
+            font-size: 1.6em;
+        }
+
+        .copyleft {
+            margin-top: 1em;
+            font-size: 0.8em;
+            text-align: center;
+        }
+
+        .mt-1 {
+            margin-top: 1em;
+        }
+    </style>
+</head>
+<body>
+
+<div style="padding-left: 0.5em; padding-right: 0.5em">
+    <h1 style="text-align: center;">로그인/가입</h1>
+    <hr>
+
+    <div class="f18" id="alert">
+
+    </div>
+
+    <div id="login_form" style="margin-top: 2em; margin-bottom: 2em">
+        <div class="mt-1">
+            <label for="username">학번(숫자 8자리)</label>
+            <input type="text" id="username">
+        </div>
+
+        <div class="mt-1">
+            <label for="password">암호(4~36자리)</label>
+            <input type="password" id="password">
+        </div>
+
+        <div class="mt-1" id="password_repeat_div" style="display: none;">
+            <label for="password_repeat">암호(재입력)</label>
+            <input type="password" id="password_repeat">
+        </div>
+    </div>
+
+    <div>
+        <ul>
+            <li>학번은 출석체크 URL을 생성하는 데 필요합니다.</li>
+            <li>암호는 서버에 <a
+                    href="https://ko.wikipedia.org/wiki/%EC%95%94%ED%98%B8%ED%99%94_%ED%95%B4%EC%8B%9C_%ED%95%A8%EC%88%98">단방향
+                해시</a>하여 저장합니다.
+            </li>
+        </ul>
+    </div>
+
+    <div>
+        <button id="login_btn" onclick="login()" style="width: 100%;">로그인/가입</button>
+    </div>
+</div>
+
+<div class="copyleft" style="padding-left: 0.5em; padding-right: 0.5em">
+    <hr>
+
+    <span>2021. <a href="https://works.miscthings.net">MiscThings</a></span>
+</div>
+
+<script>
+    let reg_mode = false;
+    let SERVER_ADDRESS = "//attend.miscthings.net/"
+
+    function detect_api_server() {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                url: "/7qy38tiejfkdnojiwgu9eyhijdfk",
+                success: function (data) {
+                    console.log("Hello api server!")
+                    SERVER_ADDRESS = "/"
+                    resolve()
+                },
+                error: function (xhr, status, err) {
+                    resolve()
+                },
+                timeout: 500
+            });
+        })
+    }
+
+    async function login() {
+        let trylogin = $("#login_btn")
+        trylogin.attr("disabled", true)
+        if (reg_mode && $("#password").val() !== $("#password_repeat").val()) {
+            alert(`재입력한 암호가 다릅니다.`);
+            trylogin.attr("disabled", false);
+            return;
+        }
+
+        $.ajax({
+            method: "POST",
+            url: SERVER_ADDRESS + "account/action",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                std_id: $("#username").val(),
+                password: $("#password").val(),
+                type: 0,
+                data: "",
+                account_register: reg_mode
+            }),
+            success: function (data) {
+                if (!data.success) {
+                    if (data.code === "IDINVALID" || data.code === "PWINVALID" || data.code === "PWDIDNOTMATCH") {
+                        alert(data.message);
+                        trylogin.attr("disabled", false);
+                        return;
+                    }
+
+                    if (data.code === "NOACCOUNT") {
+                        reg_mode = true;
+                        $("#alert").html(`이 학번으로 등록된 계정이 없습니다. <br>가입하시려면 나머지 폼을 채우고 가입 버튼을 누르십시오.`)
+                        $("#password_repeat_div").show()
+                        trylogin.attr("disabled", false);
+                        return;
+                    }
+                }else{
+                    localStorage.setItem("login_id", $("#username").val())
+                    localStorage.setItem("password", $("#password").val())
+                    window.location = "index.html"
+                }
+            }
+        });
+    }
+
+    $(document).ready(async function () {
+        try{
+            await detect_api_server();
+        }catch (e) {
+
+        }
+    })
+
+</script>
+
+</body>
+</html>
