@@ -1,5 +1,8 @@
 import secrets
 import base64
+import copy
+import time
+
 import bcrypt
 from typing import *
 from Crypto.Cipher import AES
@@ -54,7 +57,7 @@ class AccountAction(BaseModel):
 
 
 @app.post("/account/action")
-async def root(action: AccountAction):
+async def account(action: AccountAction):
     validate_result, msg = validate(action.std_id, action.password)
     if not validate_result:
         return msg
@@ -66,11 +69,12 @@ async def root(action: AccountAction):
             return {"success": False, "code": "NOACCOUNT", "message": "회원정보가 없습니다."}
 
         db[action.std_id] = {
-            "password": bcrypt.hashpw(action.password.encode(), bcrypt.gensalt(14)),
+            "password": bcrypt.hashpw(action.password.encode(), bcrypt.gensalt(4)),
             "data": "",
         }
     else:
-        if not bcrypt.checkpw(action.password.encode(), db[action.std_id]["password"]):
+        user_password = db[action.std_id]["password"]
+        if not bcrypt.checkpw(action.password.encode(), user_password):
             return {"success": False, "code": "PWDIDNOTMATCH", "message": "암호가 다릅니다."}
 
     if action.type == 1:
@@ -78,7 +82,7 @@ async def root(action: AccountAction):
         account_data["data"] = str(action.data)
         db[action.std_id] = account_data
 
-    ret = {"success": True, "data": db[action.std_id]["data"]}
+    ret = {"success": True, "data": copy.deepcopy(db[action.std_id]["data"])}
     db.commit()
     db.close()
 
