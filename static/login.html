@@ -136,6 +136,11 @@
                 }else{
                     localStorage.setItem("login_id", $("#username").val())
                     localStorage.setItem("password", $("#password").val())
+
+                    if(data.new_token){
+                        localStorage.setItem("password", data.new_token)
+                    }
+
                     window.location = "index.html"
                 }
             }

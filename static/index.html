@@ -111,6 +111,10 @@
                             $(this).html(localStorage.getItem("login_id"))
                         })
 
+                        if(data.new_token){
+                            localStorage.setItem("password", data.new_token)
+                        }
+
                         resolve(data.data)
                     },
                 });
