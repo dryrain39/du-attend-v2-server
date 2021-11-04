@@ -15,10 +15,6 @@
         }
 
         .f18 {
-            font-size: 1.8em;
-        }
-
-        .f16 {
             font-size: 1.6em;
         }
 
@@ -27,41 +23,64 @@
             font-size: 0.8em;
             text-align: center;
         }
+
+        .mt-1 {
+            margin-top: 1em;
+        }
     </style>
 </head>
 <body>
 
-<div>
-    <h1 style="text-align: center;">나의 강의실</h1>
+<div style="padding-left: 0.5em; padding-right: 0.5em">
+    <h1 style="text-align: center;">회원정보</h1>
     <hr>
 
-    <div style="margin-top: 1em; margin-bottom: 0.5em" class="f18">
-        안녕하세요, <a href="user.html" class="login_id"></a>님!
+    <div class="f18" id="alert">
+
     </div>
 
-    <div id="classroom_list" style="margin-top: 1em; margin-bottom: 2em">
-        <!--        <div>-->
-        <!--            <span class="f18"><span>사랑빛자유프로젝트</span> 강의실 <br>→ </span>-->
-        <!--            <a href="#" class="f18">출석</a>-->
-        <!--            -->
-        <!--        </div>-->
-    </div>
+    <div id="login_form" style="margin-top: 2em; margin-bottom: 2em">
+        <div class="mt-1">
+            <label for="username">학번(숫자 8자리)</label>
+            <input type="text" id="username" disabled>
+        </div>
 
+        <div class="mt-1">
+            <label for="password">암호(4~36자리)</label>
+            <input type="password" id="password">
+        </div>
+
+        <div class="mt-1" id="password_new_div">
+            <label for="password_new">새 암호(4~36자리)</label>
+            <input type="password" id="password_new">
+        </div>
+    </div>
 
     <div>
-        <button style="width: 100%;" onclick="window.location = 'qr.html'">강의실 추가</button>
+        <ul>
+            <li>학번은 변경할 수 없습니다.</li>
+            <li>학번은 출석체크 URL을 생성하는 데 필요합니다.</li>
+            <li>암호는 서버에 <a
+                    href="https://ko.wikipedia.org/wiki/%EC%95%94%ED%98%B8%ED%99%94_%ED%95%B4%EC%8B%9C_%ED%95%A8%EC%88%98">단방향
+                해시</a>하여 저장합니다.
+            </li>
+            <li>암호 변경 없이 모든 기기에서 로그아웃하려면 새 암호 칸에 기존 암호를 입력하세요.</li>
+        </ul>
+    </div>
+
+    <div>
+        <button id="login_btn" onclick="change_password()" style="width: 100%;">비밀번호 변경 / 모든 기기에서 로그아웃</button>
     </div>
 </div>
 
-<hr>
+<div class="copyleft" style="padding-left: 0.5em; padding-right: 0.5em">
+    <hr>
 
-<div class="copyleft">
     <span>2021. <a href="https://works.miscthings.net">MiscThings</a></span>
 </div>
 
 <script>
     let SERVER_ADDRESS = "//attend.miscthings.net/"
-    let classrooms = [];
 
     function detect_api_server() {
         return new Promise(function (resolve, reject) {
@@ -79,6 +98,7 @@
             });
         })
     }
+
 
     function classroom_data(push, data) {
         let type = 0
@@ -107,9 +127,7 @@
                             window.location = "login.html"
                         }
 
-                        $(".login_id").each(function () {
-                            $(this).html(localStorage.getItem("login_id"))
-                        })
+                        $("#username").val(localStorage.getItem("login_id"))
 
                         if(data.new_token){
                             localStorage.setItem("password", data.new_token)
@@ -124,53 +142,56 @@
         })
     }
 
-    async function deleteclassroom(idx) {
-        if (confirm("정말 삭제하시겠습니까?")) {
-            classrooms.splice(idx, 1);
-            await classroom_data(1, JSON.stringify(classrooms));
-            await draw_classroom(classrooms);
-        }
-    }
 
-    async function renameclassroom(idx) {
-        let original_name = classrooms[idx].name
-        let new_name = prompt("새 이름을 입력해 주십시오.", original_name);
-        if(new_name != null){
-            classrooms[idx].name = new_name;
-            await classroom_data(1, JSON.stringify(classrooms));
-            await draw_classroom(classrooms);
-        }
-    }
+    async function change_password() {
+        let trylogin = $("#login_btn")
+        trylogin.attr("disabled", true)
 
+        $.ajax({
+            method: "POST",
+            url: SERVER_ADDRESS + "account/change_password",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                std_id: $("#username").val(),
+                password: $("#password").val(),
+                new_password: $("#password_new").val(),
+            }),
+            success: function (data) {
+                if (!data.success) {
+                    if (data.code === "IDINVALID" || data.code === "PWINVALID" || data.code === "PWDIDNOTMATCH") {
+                        alert(data.message);
+                        trylogin.attr("disabled", false);
+                        return;
+                    }
 
-    function draw_classroom(classrooms) {
-        $("#classroom_list").empty();
-        classrooms.forEach(function (e, i) {
-            let url = SERVER_ADDRESS + `attend_url?std_id=${localStorage.getItem("login_id")}&qr_string=${e.qr_string}`
-            $("#classroom_list").append(`<div style="margin-bottom: 1em;" >
-            <span class="f18"><span>${e.name}</span> 강의실 <br></span>
-            <span class="f16">→</span>
-            <a class="attend_lnk f16" href="${url}" target="_blank">출석</a> 또는
-            <a id="editdig-trigger" href="#" class="f16" onclick="renameclassroom(${i})">편집</a> 또는
-            <a id="editdig-trigger" href="#" class="f16" onclick="deleteclassroom(${i})">삭제</a>
-        </div>`)
-        })
+                    if (data.code === "NOACCOUNT") {
+                        window.location = "login.html"
+                        trylogin.attr("disabled", false);
+                        return;
+                    }
+                }else{
+                    localStorage.setItem("login_id", $("#username").val())
+                    localStorage.setItem("password", $("#password").val())
+
+                    if(data.new_token){
+                        localStorage.setItem("password", data.new_token)
+                    }
+
+                    window.location = "index.html"
+                }
+            }
+        });
     }
 
     $(document).ready(async function () {
-        try {
+        try{
             await detect_api_server();
-        } catch (e) {
+            await classroom_data();
+        }catch (e) {
 
         }
-        classrooms = await classroom_data();
-        try {
-            classrooms = JSON.parse(classrooms);
-        } catch (e) {
-            classrooms = [];
-        }
-        draw_classroom(classrooms);
     })
+
 </script>
 
 </body>
