@@ -19,6 +19,9 @@ import re
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+TOKEN_CACHE = diskcache.FanoutCache("./token_cache")
+USER_DB = SqliteDict('./database.sqlite', autocommit=False)
+
 origins = [
     "http://dryrain39.github.io",
     "https://dryrain39.github.io",
@@ -56,48 +59,73 @@ class AccountAction(BaseModel):
     account_register: Optional[bool] = None
 
 
+class ChangePasswordAction(BaseModel):
+    std_id: str
+    password: str
+    new_password: str
+
+
+@app.post("/account/change_password")
+async def change_password(action: ChangePasswordAction):
+
+
+    if not USER_DB.get(action.std_id, False):
+        return {"success": False, "code": "NOACCOUNT", "message": "회원정보가 없습니다."}
+    else:
+        user_password = USER_DB[action.std_id]["password"]
+        # 암호로 체크
+        if not bcrypt.checkpw(action.password.encode(), user_password):
+            return {"success": False, "code": "PWDIDNOTMATCH", "message": "암호가 다릅니다."}
+
+    user_info = USER_DB[action.std_id]
+    user_info["password"] = bcrypt.hashpw(action.new_password.encode(), bcrypt.gensalt(4))
+    USER_DB[action.std_id] = user_info
+
+    USER_DB.commit()
+
+    return {"success": True}
+
+
 @app.post("/account/action")
 async def account(action: AccountAction):
     validate_result, msg = validate(action.std_id, action.password)
     if not validate_result:
         return msg
 
-    db = SqliteDict('./database.sqlite', autocommit=False)
-    token_cache = diskcache.FanoutCache("./token_cache")
     login_by_token = False
 
-    if not db.get(action.std_id, False):
+    if not USER_DB.get(action.std_id, False):
         if not action.account_register:
             return {"success": False, "code": "NOACCOUNT", "message": "회원정보가 없습니다."}
 
-        db[action.std_id] = {
+        USER_DB[action.std_id] = {
             "password": bcrypt.hashpw(action.password.encode(), bcrypt.gensalt(4)),
             "data": "",
         }
     else:
-        user_password = db[action.std_id]["password"]
+        user_password = USER_DB[action.std_id]["password"]
         # 토큰으로 체크 또는 암호로 체크
+
         if not bcrypt.checkpw(action.password.encode(), user_password):
-            if token_cache.get(action.password, None) != action.std_id:
+            if TOKEN_CACHE.get(action.password, None) != user_password:
                 return {"success": False, "code": "PWDIDNOTMATCH", "message": "암호가 다릅니다."}
             login_by_token = True
 
     if action.type == 1:
-        account_data = db[action.std_id]
+        account_data = USER_DB[action.std_id]
         account_data["data"] = str(action.data)
-        db[action.std_id] = account_data
+        USER_DB[action.std_id] = account_data
 
-    ret = {"success": True, "data": copy.deepcopy(db[action.std_id]["data"])}
+    ret = {"success": True, "data": copy.deepcopy(USER_DB[action.std_id]["data"])}
 
     # 암호로 로그인했으면 토큰을 등록해준다
     if not login_by_token:
         new_token = secrets.token_urlsafe(16)
         ret["new_token"] = new_token
-        token_cache.add(key=new_token, value=action.std_id, expire=604800)  # 604800 = 7 days
+        TOKEN_CACHE.add(key=new_token, value=USER_DB[action.std_id]["password"], expire=604800)  # 604800 = 7 days
 
-    db.commit()
-    db.close()
-    token_cache.close()
+    USER_DB.commit()
+    # token_cache.close()
 
     return ret
 
