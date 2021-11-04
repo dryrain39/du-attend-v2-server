@@ -60,16 +60,17 @@
         <ul>
             <li>학번은 변경할 수 없습니다.</li>
             <li>학번은 출석체크 URL을 생성하는 데 필요합니다.</li>
-            <li>암호는 서버에 <a
+            <li>암호는 서버에 <a target="_blank"
                     href="https://ko.wikipedia.org/wiki/%EC%95%94%ED%98%B8%ED%99%94_%ED%95%B4%EC%8B%9C_%ED%95%A8%EC%88%98">단방향
                 해시</a>하여 저장합니다.
             </li>
-            <li>암호 변경 없이 모든 기기에서 로그아웃하려면 새 암호 칸에 기존 암호를 입력하세요.</li>
+            <li>암호 변경 없이 다른 기기에서 로그아웃하려면 새 암호 칸에 기존 암호를 입력하세요.</li>
         </ul>
     </div>
 
     <div>
-        <button id="login_btn" onclick="change_password()" style="width: 100%;">비밀번호 변경 / 모든 기기에서 로그아웃</button>
+        <button id="login_btn" onclick="change_password()" style="width: 100%;">비밀번호 변경</button>
+        <button id="logout_btn" onclick="logout()" style="width: 100%;">로그아웃</button>
     </div>
 </div>
 
@@ -97,6 +98,12 @@
                 timeout: 500
             });
         })
+    }
+
+
+    function logout(){
+        localStorage.setItem("password", "")
+        window.location = "index.html"
     }
 
 
