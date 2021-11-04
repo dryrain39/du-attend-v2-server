@@ -8,7 +8,7 @@ from typing import *
 from Crypto.Cipher import AES
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
-
+import diskcache
 from settings import *
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -63,6 +63,8 @@ async def account(action: AccountAction):
         return msg
 
     db = SqliteDict('./database.sqlite', autocommit=False)
+    token_cache = diskcache.FanoutCache("./token_cache")
+    login_by_token = False
 
     if not db.get(action.std_id, False):
         if not action.account_register:
@@ -74,8 +76,11 @@ async def account(action: AccountAction):
         }
     else:
         user_password = db[action.std_id]["password"]
+        # 토큰으로 체크 또는 암호로 체크
         if not bcrypt.checkpw(action.password.encode(), user_password):
-            return {"success": False, "code": "PWDIDNOTMATCH", "message": "암호가 다릅니다."}
+            if token_cache.get(action.password, None) != action.std_id:
+                return {"success": False, "code": "PWDIDNOTMATCH", "message": "암호가 다릅니다."}
+            login_by_token = True
 
     if action.type == 1:
         account_data = db[action.std_id]
@@ -83,8 +88,16 @@ async def account(action: AccountAction):
         db[action.std_id] = account_data
 
     ret = {"success": True, "data": copy.deepcopy(db[action.std_id]["data"])}
+
+    # 암호로 로그인했으면 토큰을 등록해준다
+    if not login_by_token:
+        new_token = secrets.token_urlsafe(16)
+        ret["new_token"] = new_token
+        token_cache.add(key=new_token, value=action.std_id, expire=604800)  # 604800 = 7 days
+
     db.commit()
     db.close()
+    token_cache.close()
 
     return ret
 
