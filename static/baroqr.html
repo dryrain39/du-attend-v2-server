@@ -39,7 +39,7 @@
 <body>
 
 <div>
-    <h1 style="text-align: center;">강의실 추가</h1>
+    <h1 style="text-align: center;">바로출석</h1>
     <hr>
 
     <div class="f18" style="margin-top: 1em; margin-bottom: 1em; text-align: center;">
@@ -52,19 +52,6 @@
 
     <div id="reader" style="margin-top: 1em; margin-bottom: 2em">
 
-    </div>
-
-    <div style="text-align: center; margin-bottom: 1em; display: none;" id="classRoomNameDiv">
-        <span class="f18"><span id="classRoomName" style="font-weight: bold"></span> 강의실 <br>→ </span>
-        <a href="#" class="f18" onclick="change_classroom_name()">이름 변경</a>
-    </div>
-    <!--    <div style="width: 100%; text-align:center ;">-->
-    <!--        <input type="text" style="margin-right: auto;margin-left: auto; width: auto" placeholder="강의실 이름을 입력하세요" aria-describedby="강의실 이름을 입력하세요."-->
-    <!--               aria-labelledby="강의실 이름을 입력하세요.">-->
-    <!--    </div>-->
-
-    <div>
-        <button id="save_btn" onclick="save()" style="width: 100%; display: none">강의실 저장</button>
     </div>
 </div>
 
@@ -80,11 +67,6 @@
     let classroomName = "";
     let qrCodeData = "";
     let SERVER_ADDRESS = "//attend.miscthings.net/"
-
-    function change_classroom_name(){
-        classroomName = prompt("강의실 이름을 입력해주세요.", classroomName);
-        $("#classRoomName").html(classroomName);
-    }
 
     function detect_api_server() {
         return new Promise(function (resolve, reject) {
@@ -143,30 +125,6 @@
         })
     }
 
-    async function save(){
-        let savebtn = $("#save_btn")
-
-        savebtn.attr("disabled", true)
-
-        savebtn.html("서버에서 데이터 가져오는 중...")
-        let clsdata = await classroom_data();
-        try {
-            clsdata = JSON.parse(clsdata);
-        }catch (e) {
-            console.log("디코드에 실패했습니다...", {clsdata})
-            clsdata = []
-        }
-
-        clsdata.push({
-            "qr_string": qrCodeData,
-            "name": classroomName,
-        })
-
-        savebtn.html("저장 중...")
-        await classroom_data(1, JSON.stringify(clsdata));
-
-        window.location.replace("index.html");
-    }
 
     $(document).ready(async function () {
         await detect_api_server();
@@ -227,6 +185,11 @@
 
         alertText('#alert', 'info', "QR코드를 인식시켜 주십시오.");
         let result = await captureQRData(cameraList[0].id);
+        alertText('#alert', 'info', "출석 URL 받아오는 중...");
+        let url = SERVER_ADDRESS + `attend_url?std_id=${localStorage.getItem("login_id")}&qr_string=${result}`
+        window.location.replace(url);
+
+
         qrCodeData = result
         classroomName = result.substr(0, 4);
 
