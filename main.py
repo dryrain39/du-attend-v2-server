@@ -20,6 +20,7 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 TOKEN_CACHE = diskcache.FanoutCache("./token_cache")
+QR_DECODE_CACHE = diskcache.FanoutCache("./qr_cache")
 USER_DB = SqliteDict('./database.sqlite', autocommit=False)
 
 origins = [
@@ -67,8 +68,6 @@ class ChangePasswordAction(BaseModel):
 
 @app.post("/account/change_password")
 async def change_password(action: ChangePasswordAction):
-
-
     if not USER_DB.get(action.std_id, False):
         return {"success": False, "code": "NOACCOUNT", "message": "회원정보가 없습니다."}
     else:
@@ -130,14 +129,23 @@ async def account(action: AccountAction):
     return ret
 
 
-@app.get("/attend_url")
-async def decode(qr_string: str, std_id: str):
+@QR_DECODE_CACHE.memoize(typed=True, expire=86400)
+def decode_data(qr_string: str):
     qr_encrypted = bytes.fromhex(qr_string)
 
     cipher = AES.new(KEY, AES.MODE_ECB)
     qr_data = _unpad(cipher.decrypt(qr_encrypted)).decode('utf-8')
-    nfc_data = base64.b64encode(qr_data.encode()).decode("utf-8")
-    std_id = base64.b64encode(std_id.encode()).decode("utf-8")
+    return qr_data
+
+
+@app.get("/attend_url")
+async def decode(qr_string: str, std_id: str):
+    try:
+        qr_data = decode_data(qr_string)
+        nfc_data = base64.b64encode(qr_data.encode()).decode("utf-8")
+        std_id = base64.b64encode(std_id.encode()).decode("utf-8")
+    except Exception as e:
+        return {"message": "뒤로가기 후 다시 시도해 주세요."}
 
     parameter = f"?sno={std_id}&nfc={nfc_data}&type=UQ==&gpsLati=MA==&gpsLong=MA==&time_stamp=%7BtimeStamp%7D&pgmNew=Y"
     return RedirectResponse(url='http://attend.daegu.ac.kr:8081/web/std/checkAttend.do' + parameter)
