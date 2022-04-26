@@ -2,24 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="sentry-trace" content="{{ trace }}"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="icon/favicon.ico" type="image/x-icon" />
-    <link rel="apple-touch-icon" href="icon/apple-touch-icon.png" />
-    <link rel="apple-touch-icon" sizes="57x57" href="icon/apple-touch-icon-57x57.png" />
-    <link rel="apple-touch-icon" sizes="72x72" href="icon/apple-touch-icon-72x72.png" />
-    <link rel="apple-touch-icon" sizes="76x76" href="icon/apple-touch-icon-76x76.png" />
-    <link rel="apple-touch-icon" sizes="114x114" href="icon/apple-touch-icon-114x114.png" />
-    <link rel="apple-touch-icon" sizes="120x120" href="icon/apple-touch-icon-120x120.png" />
-    <link rel="apple-touch-icon" sizes="144x144" href="icon/apple-touch-icon-144x144.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="icon/apple-touch-icon-152x152.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="icon/apple-touch-icon-180x180.png" />
+    <link rel="shortcut icon" href="icon/favicon.ico" type="image/x-icon"/>
+    <link rel="apple-touch-icon" href="icon/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="57x57" href="icon/apple-touch-icon-57x57.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="icon/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="76x76" href="icon/apple-touch-icon-76x76.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="icon/apple-touch-icon-114x114.png"/>
+    <link rel="apple-touch-icon" sizes="120x120" href="icon/apple-touch-icon-120x120.png"/>
+    <link rel="apple-touch-icon" sizes="144x144" href="icon/apple-touch-icon-144x144.png"/>
+    <link rel="apple-touch-icon" sizes="152x152" href="icon/apple-touch-icon-152x152.png"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="icon/apple-touch-icon-180x180.png"/>
 
     <title>DU Attend v2</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
     <link rel="stylesheet" type="text/css"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css"/>
-    <script src="https://code.jquery.com/jquery-3.6.0.js"
-            integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="jquery-3.6.0.min.js"></script>
+    <script src="sentry.min.js"></script>
     <style>
         body {
             font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
@@ -69,7 +70,8 @@
 <div class="copyleft">
     <span>
         2021. <a target="_blank" href="https://works.miscthings.net">MiscThings</a>,
-        <a target="_blank" href="https://works.miscthings.net/8473586c-4975-4175-afd6-c46e0a7a19fd">도움말 &centerdot; 사용법</a>
+        <a target="_blank"
+           href="https://works.miscthings.net/8473586c-4975-4175-afd6-c46e0a7a19fd">도움말 &centerdot; 사용법</a>
     </span>
 </div>
 
@@ -125,7 +127,7 @@
                             $(this).html(localStorage.getItem("login_id"))
                         })
 
-                        if(data.new_token){
+                        if (data.new_token) {
                             localStorage.setItem("password", data.new_token)
                         }
 
@@ -149,7 +151,7 @@
     async function renameclassroom(idx) {
         let original_name = classrooms[idx].name
         let new_name = prompt("새 이름을 입력해 주십시오.", original_name);
-        if(new_name != null){
+        if (new_name != null) {
             classrooms[idx].name = new_name;
             await classroom_data(1, JSON.stringify(classrooms));
             await draw_classroom(classrooms);

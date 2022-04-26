@@ -1,5 +1,7 @@
-__*
 venv
 .idea
 settings.py
 database.sqlite
+qr_cache
+__py*
+token_cache
