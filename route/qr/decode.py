@@ -1,4 +1,5 @@
 import base64
+import logging
 
 import sentry_sdk
 from sentry_sdk import start_transaction
@@ -30,10 +31,11 @@ def decode_data(qr_string: str):
 @router.get("/attend_url")
 async def decode(qr_string: str, std_id: str):
     try:
-        qr_data = decode_data(qr_string, std_id)
+        qr_data = decode_data(qr_string)
         nfc_data = base64.b64encode(qr_data.encode()).decode("utf-8")
         std_id = base64.b64encode(std_id.encode()).decode("utf-8")
     except Exception as e:
+        logging.exception(e, exc_info=True)
         return {"message": "뒤로가기 후 다시 시도해 주세요."}
 
     parameter = f"?sno={std_id}&nfc={nfc_data}&type=UQ==&gpsLati=MA==&gpsLong=MA==&time_stamp=%7BtimeStamp%7D&pgmNew=Y"
