@@ -8,7 +8,8 @@ from fastapi import APIRouter
 from sentry_sdk import start_transaction
 from sqlitedict import SqliteDict
 
-from model.account_models import ChangePasswordAction, AccountAction
+from VO.account_vo import ChangePasswordAction, AccountAction
+from VO.response_code import Code, MSG
 
 router = APIRouter()
 USER_DB = SqliteDict('./database.sqlite', autocommit=False)
@@ -17,10 +18,10 @@ TOKEN_CACHE = diskcache.FanoutCache("./token_cache")
 
 def validate(std_id, password):
     if not re.match(r"^[0-9]{8}$", std_id):
-        return False, {"success": False, "code": "IDINVALID", "message": "ID 는 학번이여야 합니다."}
+        return False, {"success": False, "code": Code.INVALID_ID, "message": MSG.INVALID_ID}
 
     if len(password) > 36 or len(password) < 4:
-        return False, {"success": False, "code": "PWINVALID", "message": "비밀번호는 4 ~ 36 자리로 입력해 주세요."}
+        return False, {"success": False, "code": Code.INVALID_PW, "message": MSG.INVALID_PW}
 
     return True, {}
 
@@ -36,12 +37,12 @@ async def change_password(action: ChangePasswordAction):
         return msg
 
     if not USER_DB.get(action.std_id, False):
-        return {"success": False, "code": "NOACCOUNT", "message": "회원정보가 없습니다."}
+        return {"success": False, "code": Code.ID_NOT_FOUND, "message": MSG.ID_NOT_FOUND}
     else:
         user_password = USER_DB[action.std_id]["password"]
         # 암호로 체크
         if not bcrypt.checkpw(action.password.encode(), user_password):
-            return {"success": False, "code": "PWDIDNOTMATCH", "message": "암호가 다릅니다."}
+            return {"success": False, "code": Code.PW_NOT_MATCH, "message": MSG.PW_NOT_MATCH}
 
     user_info = USER_DB[action.std_id]
     user_info["password"] = bcrypt.hashpw(action.new_password.encode(), bcrypt.gensalt(4))
@@ -63,7 +64,7 @@ async def account(action: AccountAction):
     if not USER_DB.get(action.std_id, False):
 
         if not action.account_register:
-            return {"success": False, "code": "NOACCOUNT", "message": "회원정보가 없습니다."}
+            return {"success": False, "code": Code.ID_NOT_FOUND, "message": MSG.ID_NOT_FOUND}
 
         USER_DB[action.std_id] = {
             "password": bcrypt.hashpw(action.password.encode(), bcrypt.gensalt(4)),
@@ -75,7 +76,7 @@ async def account(action: AccountAction):
 
         if not bcrypt.checkpw(action.password.encode(), user_password):
             if TOKEN_CACHE.get(action.password, None) != user_password:
-                return {"success": False, "code": "PWDIDNOTMATCH", "message": "암호가 다릅니다."}
+                return {"success": False, "code": Code.PW_NOT_MATCH, "message": MSG.PW_NOT_MATCH}
             login_by_token = True
 
     if action.type == 1:

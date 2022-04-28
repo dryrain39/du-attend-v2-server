@@ -5,3 +5,4 @@ database.sqlite
 qr_cache
 __py*
 token_cache
+promotion_db

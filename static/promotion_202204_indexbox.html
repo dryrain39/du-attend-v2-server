@@ -1,0 +1,95 @@
+<div id="promo2204_box" style="padding: 12px; border: 3px #198754 dashed;">
+    <div class="row">
+        <div class="col-lg-12 col-md-12" style="text-align: center">
+            <div style="font-size: 1em;">친구에게 소개하고 스타벅스 쿠폰 받으세요!</div>
+        </div>
+        <div class="col-lg-12 col-md-12 mt-2" style="padding-right: 30px; text-align: center">
+            <button onClick="promo2204_get_url_modal();">소개 링크 받기</button>
+        </div>
+    </div>
+</div>
+<dialog id="promo2204_dialog">
+    <header>친구 소개 프로모션</header>
+    <form method="dialog">
+        <p>
+            대구대 재학생에게 이 서비스를 소개해주세요!
+            <br>단톡방, 커뮤니티 등 어디든 좋습니다.
+            <br>기간: 2022.04.28.~2022.05.31.
+        </p>
+        <p style="font-size: 0.8em;">
+            추첨 기준<br>
+            1. 응모 <b>링크 접속에 대한 통계 조회</b> 후 상위 10% 쿠폰 지급<br>
+            2. 남은 쿠폰을 랜덤 추첨하여 지급
+        </p>
+        <p id="linkview">수락을 누르시면 추천 링크가 생성됩니다.</p>
+        <div class="col-lg-12 col-md-12 mt-2" style="text-align: center">
+            <button value="deny">닫기</button>
+            <button type="button" id="promo2204_accept" onClick="promo2204_get_url(1);">수락</button>
+        </div>
+    </form>
+</dialog>
+<script>
+    const PROMO_2204_URL = "attend.miscthings.net/2204/"
+
+    function promo2204_get_url_modal() {
+        document.getElementById('promo2204_dialog').showModal();
+    }
+
+    function copy_link(link) {
+        var dummy = document.createElement("textarea");
+        document.body.appendChild(dummy);
+        dummy.value = `https://${PROMO_2204_URL}${link}`;
+        dummy.select();
+        document.execCommand("copy");
+        document.body.removeChild(dummy);
+    }
+
+    function promo2204_get_url(genmode) {
+        let url = "";
+        if (genmode === 0) {
+            url = "/2204/check/"
+        }
+        if (genmode === 1) {
+            url = "/2204/get_code/"
+        }
+
+        if (localStorage.getItem("login_id") && localStorage.getItem("password")) {
+            $.ajax({
+                method: "POST",
+                url: url,
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    std_id: localStorage.getItem("login_id"),
+                    password: localStorage.getItem("password"),
+                    type: 0,
+                    data: "",
+                    account_register: false
+                }),
+                success: function (data) {
+                    if ((genmode === 0 && data.accept) || (genmode === 1 && data.success)) {
+                        $("#linkview").html(`
+                            <label for="">추천 링크:</label>
+                            <input type="text" style="width: 100%"
+                            onfocus="this.setSelectionRange(0, this.value.length)"
+                            onClick="this.setSelectionRange(0, this.value.length)"
+                            value="https://${PROMO_2204_URL}${data.message}">
+                            `).attr("style", "padding-right: 20px;")
+
+                        $("#promo2204_accept").hide()
+                    }
+                },
+            });
+        } else {
+            window.location = "login.html"
+        }
+    }
+
+    document.getElementById("promo2204_dialog").addEventListener("close", function (e) {
+        let response = e.target.returnValue;
+        if (response === "login") {
+            alert("login")
+        }
+    });
+
+    promo2204_get_url(0);
+</script>

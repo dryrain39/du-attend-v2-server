@@ -4,22 +4,23 @@
     <meta charset="UTF-8">
     <meta name="sentry-trace" content="{{ trace }}"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="icon/favicon.ico" type="image/x-icon" />
-    <link rel="apple-touch-icon" href="icon/apple-touch-icon.png" />
-    <link rel="apple-touch-icon" sizes="57x57" href="icon/apple-touch-icon-57x57.png" />
-    <link rel="apple-touch-icon" sizes="72x72" href="icon/apple-touch-icon-72x72.png" />
-    <link rel="apple-touch-icon" sizes="76x76" href="icon/apple-touch-icon-76x76.png" />
-    <link rel="apple-touch-icon" sizes="114x114" href="icon/apple-touch-icon-114x114.png" />
-    <link rel="apple-touch-icon" sizes="120x120" href="icon/apple-touch-icon-120x120.png" />
-    <link rel="apple-touch-icon" sizes="144x144" href="icon/apple-touch-icon-144x144.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="icon/apple-touch-icon-152x152.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="icon/apple-touch-icon-180x180.png" />
+    <link rel="shortcut icon" href="/static/icon/favicon.ico" type="image/x-icon"/>
+    <link rel="apple-touch-icon" href="/static/icon/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="57x57" href="/static/icon/apple-touch-icon-57x57.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="/static/icon/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="76x76" href="/static/icon/apple-touch-icon-76x76.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="/static/icon/apple-touch-icon-114x114.png"/>
+    <link rel="apple-touch-icon" sizes="120x120" href="/static/icon/apple-touch-icon-120x120.png"/>
+    <link rel="apple-touch-icon" sizes="144x144" href="/static/icon/apple-touch-icon-144x144.png"/>
+    <link rel="apple-touch-icon" sizes="152x152" href="/static/icon/apple-touch-icon-152x152.png"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/icon/apple-touch-icon-180x180.png"/>
     <title>DU Attend v2 소개 페이지</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <link rel="stylesheet" href="/static/bootstrap-grid.css">
     <link rel="stylesheet" type="text/css"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css"/>
-    <script src="jquery-3.6.0.min.js"></script>
-    <script src="sentry.min.js"></script>
+    <script src="/static/jquery-3.6.0.min.js"></script>
+    <script src="/static/sentry.min.js"></script>
     <style>
         body {
             font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
@@ -46,127 +47,77 @@
     <h1 style="text-align: center;">DU Attend 소개</h1>
     <hr>
 
-    <div class="f18" id="alert">
+    <!--    <div class="f18" id="alert">-->
 
-    </div>
-
-    <div id="login_form" style="margin-top: 2em; margin-bottom: 2em">
-        <div class="mt-1">
-            <label for="username">학번(숫자 8자리)</label>
-            <input type="text" id="username">
-        </div>
-
-        <div class="mt-1">
-            <label for="password">암호(4~36자리)</label>
-            <input type="password" id="password">
-        </div>
-
-        <div class="mt-1" id="password_repeat_div" style="display: none;">
-            <label for="password_repeat">암호(재입력)</label>
-            <input type="password" id="password_repeat">
-        </div>
-    </div>
+    <!--    </div>-->
 
     <div>
-        <ul>
-            <li>학번은 출석체크 URL을 생성하는 데 필요합니다.</li>
-            <li>암호는 서버에 <a
-                    href="https://ko.wikipedia.org/wiki/%EC%95%94%ED%98%B8%ED%99%94_%ED%95%B4%EC%8B%9C_%ED%95%A8%EC%88%98">단방향
-                해시</a>하여 저장합니다.
-            </li>
-        </ul>
+        <h2>DU Attend 란? </h2>
+        <p>
+            수업 직전 출결 QR을 찍으러 갈 필요 없이 자리에서 전자출결을 도와주는 서비스 입니다. <br>
+            일반적으로 수업 10분전 QR출결을 위해 강의실 문앞에 모여 출결을 하는데요. <br>
+            아래 리스트에 해당 되시는 분에게 적극 추천합니다. 😀<br>
+        </p>
+
+        <h2>이런 분에게 필요해요❗</h2>
+        <p>
+            ✅ 강의실에 미리 와서 대기한다.<br>
+            ✅ 출결 QR할때 사람 모이는게 복잡하다.<br>
+            ✅ 다리를 다쳐 거동이 불편하다.<br>
+        </p>
+
+
+        <h2>사용법</h2>
+        <img src="/static/image/intro.png" alt="QR 을 찍는 사람, DU Mobile 에 접속하고 출석 링크를 클릭하는 사람">
+        <div>
+            <ol>
+                <li>회원가입 / 로그인 후 강의실 추가 버튼을 누르세요.</li>
+                <li>강의실 벽면에 부착된 QR 코드를 DU Attend 서비스에 미리 스캔합니다. (강의실마다 최초 1회)</li>
+                <li>원하는 강의실의 출석 링크를 누르세요. <b>2번 과정을 한 번만 진행하면 이후 계속 사용할 수 있습니다!</b> 😮</li>
+            </ol>
+        </div>
+
+        <h2>주의사항</h2>
+        <div>
+            <ol>
+                <li>강의실 근처의 DU Mobile Wifi에 접속해야 합니다.</li>
+            </ol>
+        </div>
+
+        <h2>의견·문의</h2>
+        <span>문의 시스템은 현재 공사중 입니다. 불편하시겠지만 아래 메일로 연락 부탁드립니다.</span>
+        <div>
+            <ul>
+                <li>패스워드 분실 문의 → <a href="mailto:attend.du@dlnk.io">attend.du@dLnk.io</a></li>
+                <li>기타 의견·문의 → <a href="mailto:attend.du@dlnk.io">attend.du@dLnk.io</a></li>
+            </ul>
+        </div>
+
+
+        <h2>만든이</h2>
+        <span>MiscThings 동아리 → <a href="https://works.miscthings.net/" target="_blank">works.miscthings.net</a></span>
+        <div>
+            <ul>
+                <li><span onclick="alert('이승욱')">승우기</span>: 프론트엔드, 테스트, 교정, 홍보</li>
+                <li>안건우: 백엔드, 프론트엔드, 문의응대, 서버지원</li>
+                <li>이진우: 테스트</li>
+                <li>서보성: 테스트</li>
+                <li>이창엽: 테스트</li>
+                <li>신진우: 테스트</li>
+            </ul>
+        </div>
+
+        <span><a href="/">홈으로 →</a></span>
     </div>
 
-    <div>
-        <button id="login_btn" onclick="login()" style="width: 100%;">로그인/가입</button>
-    </div>
+
 </div>
 
 <div class="copyleft" style="padding-left: 0.5em; padding-right: 0.5em">
     <hr>
-
-    <span>2021. <a href="https://works.miscthings.net">MiscThings</a></span>
-</div>
-
-<script>
-    let reg_mode = false;
-    let SERVER_ADDRESS = "//attend.miscthings.net/"
-
-    function detect_api_server() {
-        return new Promise(function (resolve, reject) {
-            $.ajax({
-                url: "/7qy38tiejfkdnojiwgu9eyhijdfk",
-                success: function (data) {
-                    console.log("Hello api server!")
-                    SERVER_ADDRESS = "/"
-                    resolve()
-                },
-                error: function (xhr, status, err) {
-                    resolve()
-                },
-                timeout: 500
-            });
-        })
-    }
-
-    async function login() {
-        let trylogin = $("#login_btn")
-        trylogin.attr("disabled", true)
-        if (reg_mode && $("#password").val() !== $("#password_repeat").val()) {
-            alert(`재입력한 암호가 다릅니다.`);
-            trylogin.attr("disabled", false);
-            return;
-        }
-
-        $.ajax({
-            method: "POST",
-            url: SERVER_ADDRESS + "account/action",
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify({
-                std_id: $("#username").val(),
-                password: $("#password").val(),
-                type: 0,
-                data: "",
-                account_register: reg_mode
-            }),
-            success: function (data) {
-                if (!data.success) {
-                    if (data.code === "IDINVALID" || data.code === "PWINVALID" || data.code === "PWDIDNOTMATCH") {
-                        alert(data.message);
-                        trylogin.attr("disabled", false);
-                        return;
-                    }
-
-                    if (data.code === "NOACCOUNT") {
-                        reg_mode = true;
-                        $("#alert").html(`이 학번으로 등록된 계정이 없습니다. <br>가입하시려면 나머지 폼을 채우고 가입 버튼을 누르십시오.`)
-                        $("#password_repeat_div").show()
-                        trylogin.attr("disabled", false);
-                        return;
-                    }
-                }else{
-                    localStorage.setItem("login_id", $("#username").val())
-                    localStorage.setItem("password", $("#password").val())
-
-                    if(data.new_token){
-                        localStorage.setItem("password", data.new_token)
-                    }
-
-                    window.location = "index.html"
-                }
-            }
-        });
-    }
-
-    $(document).ready(async function () {
-        try{
-            await detect_api_server();
-        }catch (e) {
-
-        }
-    })
-
-</script>
+    2021. <a target="_blank" href="https://works.miscthings.net">MiscThings 동아리</a>,
+    <a target="_blank"
+       href="introduce.html">도움말 &centerdot; 사용법</a></div>
 
 </body>
 </html>
