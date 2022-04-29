@@ -37,6 +37,7 @@ async def account(action: AccountAction, background_tasks: BackgroundTasks):
 async def send_telegram_message(message, login_id):
     message = message.replace("<", "＜").replace(">", "＞")
     message = f"작성자: {login_id}\n" + message
+    message = message.replace("\n", "%0A")
     url = f'https://api.telegram.org/{TELEGRAM_BOT_TOKEN}/sendMessage?chat_id={CHANNEL_ID}&text={message}'
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
