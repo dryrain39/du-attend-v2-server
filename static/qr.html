@@ -3,40 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="sentry-trace" content="{{ trace }}"/>
-    <title>DU Attend v2</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="/static/icon/favicon.ico" type="image/x-icon" />
-    <link rel="apple-touch-icon" href="/static/icon/apple-touch-icon.png" />
-    <link rel="apple-touch-icon" sizes="57x57" href="/static/icon/apple-touch-icon-57x57.png" />
-    <link rel="apple-touch-icon" sizes="72x72" href="/static/icon/apple-touch-icon-72x72.png" />
-    <link rel="apple-touch-icon" sizes="76x76" href="/static/icon/apple-touch-icon-76x76.png" />
-    <link rel="apple-touch-icon" sizes="114x114" href="/static/icon/apple-touch-icon-114x114.png" />
-    <link rel="apple-touch-icon" sizes="120x120" href="/static/icon/apple-touch-icon-120x120.png" />
-    <link rel="apple-touch-icon" sizes="144x144" href="/static/icon/apple-touch-icon-144x144.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="/static/icon/apple-touch-icon-152x152.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/icon/apple-touch-icon-180x180.png" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
-    <link rel="stylesheet" href="/static/bootstrap-grid.css">
-    <link rel="stylesheet" type="text/css"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css"/>
-    <script src="/static/jquery-3.6.0.min.js"></script>
-    <script src="/static/sentry.min.js"></script>
+    <title>DU Attend v2 - 강의실 등록</title>
+    {% include 'fragment/header.html' %}
     <script src="/static/qr.js"></script>
-    <style>
-        body {
-            font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-        }
-
-        .f18 {
-            font-size: 1.8em;
-        }
-
-        .copyleft {
-            margin-top: 1em;
-            font-size: 0.8em;
-            text-align: center;
-        }
-    </style>
 </head>
 <body>
 
@@ -70,11 +39,7 @@
     </div>
 </div>
 
-<div class="copyleft">
-    <hr>
-    2021. <a target="_blank" href="https://works.miscthings.net">MiscThings 동아리</a>,
-    <a target="_blank"
-       href="introduce.html">도움말 &centerdot; 사용법</a></div>
+{% include 'fragment/footer.html' %}
 
 <script>
     let current_html5QRCode = undefined;

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="sentry-trace" content="{{ trace }}"/>
+    <title>DU Attend v2 - 제보·문의·의견</title>
+    {% include 'fragment/header.html' %}
+    <style>
+        .mt-1 {
+            margin-top: 1em;
+        }
+    </style>
+</head>
+<body>
+
+<div style="padding-left: 0.5em; padding-right: 0.5em">
+    <h1 style="text-align: center;">제보·문의·의견</h1>
+    <hr>
+
+    <div class="f18" id="alert">
+
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <ul>
+                <li>버그 제보 / 문의 / 의견 / 개선사항 / 리뷰 를 남겨주세요.</li>
+                <li>답장을 받고 싶은 경우 연락처를 남겨주세요.</li>
+                <li>연락처를 남기지 않을 경우 답변을 받을 수 없습니다.</li>
+            </ul>
+        </div>
+
+        <div class="col-12">
+            <div>
+                <textarea name="" id="bugreport" style="width: 100%" rows="10">연락처:
+내용:</textarea>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div>
+                <button id="save_btn" onclick="save()" style="width: 100%;">전송</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% include 'fragment/footer.html' %}
+
+<script>
+    let SERVER_ADDRESS = "//attend.miscthings.net/"
+    let REPORT_INITIAL = $("#bugreport").val().trim();
+
+    function detect_api_server() {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                url: "/7qy38tiejfkdnojiwgu9eyhijdfk",
+                success: function (data) {
+                    console.log("Hello api server!")
+                    SERVER_ADDRESS = "/"
+                    resolve()
+                },
+                error: function (xhr, status, err) {
+                    resolve()
+                },
+                timeout: 500
+            });
+        })
+    }
+
+    function save() {
+        let report_text = $("#bugreport").val().trim()
+        if (report_text === REPORT_INITIAL) {
+            alert("내용을 입력하세요.")
+            return;
+        }
+
+        if (localStorage.getItem("login_id") && localStorage.getItem("password")) {
+            $.ajax({
+                method: "POST",
+                url: "/report/",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    std_id: localStorage.getItem("login_id"),
+                    password: localStorage.getItem("password"),
+                    type: 0,
+                    data: report_text,
+                    account_register: false
+                }),
+                success: function (data) {
+                    if (data.success) {
+                        alert("의견 주셔서 감사합니다!");
+                        $("#bugreport").val(REPORT_INITIAL)
+                    }else{
+                        alert(data.message)
+                    }
+                },
+            });
+        } else {
+            window.location = "login.html"
+        }
+    }
+
+    $(document).ready(async function () {
+        if (!localStorage.getItem("login_id") || !localStorage.getItem("password")) {
+            window.location = "login.html"
+        }
+        try {
+            await detect_api_server();
+        } catch (e) {
+
+        }
+    })
+
+</script>
+
+</body>
+</html>

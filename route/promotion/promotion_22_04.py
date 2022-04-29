@@ -135,8 +135,13 @@ def add_action_promotion(promo_id, mode: int, peer: str):
             viewer_ips: set = promotion_dict["viewer_ips"]
             viewer_ips.add(peer)
 
-        PROMO_DB[original_std_id] = promotion_dict
-        PROMO_DB.commit()
-        promo_logger.info(f"{mode} 모드로 저장했습니다. {original_std_id} 의 상태는 {promotion_dict} 입니다.")
+        try:
+            PROMO_DB[original_std_id] = promotion_dict
+            PROMO_DB.commit()
+            promo_logger.info(f"{mode} 모드로 저장했습니다. {original_std_id} 의 상태는 {promotion_dict} 입니다.")
+        except Exception as e:
+            promo_logger.error(f"저장 실패! add_action_promotion({promo_id}, {mode}, {peer}) 주인: {original_std_id} "
+                               f"exception: {str(e)}")
+            logging.exception(e, exc_info=True)
     else:
         promo_logger.info(f"{peer} 가 방문했지만. {promo_id} 의 주인은 {original_std_id} 입니다. ")

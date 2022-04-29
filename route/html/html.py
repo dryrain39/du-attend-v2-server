@@ -68,3 +68,21 @@ async def user_html(request: Request):
             "trace": transaction.to_traceparent(),
             "request": request
         })
+
+
+@router.get("/report.html")
+async def report_html(request: Request):
+    with start_transaction(op="report_html", name=f"report_html") as transaction:
+        return templates.TemplateResponse("report.html", {
+            "trace": transaction.to_traceparent(),
+            "request": request
+        })
+
+
+@router.get("/password_reset.html")
+async def password_reset_html(request: Request):
+    with start_transaction(op="password_reset_html", name=f"password_reset_html") as transaction:
+        return templates.TemplateResponse("password_reset.html", {
+            "trace": transaction.to_traceparent(),
+            "request": request
+        })
