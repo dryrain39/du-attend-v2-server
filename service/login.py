@@ -37,8 +37,12 @@ def login(action: AccountAction) -> LoginResponse:
 
     login_by_token = False
     new_token = None
-    user_password = USER_DB[action.std_id]["password"]
+    user_password = USER_DB.get(action.std_id, {}).get("password", None)
     # 토큰으로 체크 또는 암호로 체크
+
+    if user_password is None:
+        return LoginResponse(success=False, code="PWDIDNOTMATCH", message="암호가 다릅니다.")
+
 
     # 암호가 맞지 않으면
     if not bcrypt.checkpw(action.password.encode(), user_password):

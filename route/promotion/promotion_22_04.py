@@ -1,3 +1,4 @@
+import base64
 import copy
 import json
 import os
@@ -7,10 +8,11 @@ import shutil
 
 import bcrypt
 import diskcache
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from sentry_sdk import start_transaction, start_span
 from sqlitedict import SqliteDict
 from starlette.requests import Request
+from starlette.responses import Response
 from starlette.templating import Jinja2Templates
 
 from VO.account_vo import ChangePasswordAction, AccountAction
@@ -43,6 +45,35 @@ promo_logger.addHandler(fileHandler)
 consoleHandler = logging.StreamHandler()
 consoleHandler.setFormatter(logFormatter)
 promo_logger.addHandler(consoleHandler)
+
+
+@router.post(
+    "/getImage/",
+    response_class=Response,
+)
+async def get_image(request: Request, action: AccountAction):
+    login_result = login(action)
+    if not login_result.success:
+        promo_logger.warning(f"{action.std_id} {login_result.code} 로그인에 실패했습니다.")
+        raise HTTPException(status_code=401)
+
+    image_name = action.std_id.replace('.', '').replace("\\", "").replace("/", "")
+    coupon_file_name = f"./promotion_db/coupon/{image_name}.png"
+
+    if os.path.exists(coupon_file_name):
+        promo_logger.warning(f"{action.std_id} 쿠폰 수신.")
+        return Response(content=base64.b64encode(open(coupon_file_name, "rb").read()))
+    else:
+        raise HTTPException(status_code=404)
+
+
+@router.get("/result")
+async def promotion_result(request: Request):
+    with start_transaction(op="promotion_2204_page_result", name=f"promotion_2204_page_result") as transaction:
+        return templates.TemplateResponse("promotion_202204_result.html", {
+            "trace": transaction.to_traceparent(),
+            "request": request,
+        })
 
 
 @router.post("/check/")
