@@ -58,7 +58,7 @@ async def get_image(request: Request, action: AccountAction):
         raise HTTPException(status_code=401)
 
     image_name = action.std_id.replace('.', '').replace("\\", "").replace("/", "")
-    coupon_file_name = f"./promotion_db/coupon/{image_name}.png"
+    coupon_file_name = f"./promotion_db/coupon/{image_name}.JPG"
 
     if os.path.exists(coupon_file_name):
         promo_logger.warning(f"{action.std_id} 쿠폰 수신.")
