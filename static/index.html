@@ -4,7 +4,15 @@
     <meta charset="UTF-8">
     <meta name="sentry-trace" content="{{ trace }}"/>
     <title>DU Attend v2</title>
+
+<link rel="stylesheet" href="/static/lib/bootstrap.css">
     {% include 'fragment/header.html' %}
+<!--    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>-->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
 </head>
 <body>
 
@@ -16,9 +24,10 @@
         안녕하세요, <a href="user.html" class="login_id"></a>님!
     </div>
 
-<!--    22-04 프로모션 구간-->
-<!--    {% include 'promotion_202204_indexbox.html' %}-->
-<!--    22-04 프로모션 구간 끝-->
+    <!--    22-04 프로모션 구간-->
+    <!--    {% include 'promotion_202204_indexbox.html' %}-->
+    <!--    22-04 프로모션 구간 끝-->
+    {% include 'fragment/carousel.html' %}
 
     <div id="classroom_list" style="margin-top: 1em; margin-bottom: 2em">
         <!--        <div>-->
@@ -35,6 +44,7 @@
 </div>
 
 {% include 'fragment/footer.html' %}
+
 
 <script>
     let SERVER_ADDRESS = "//attend.miscthings.net/"
