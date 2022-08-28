@@ -17,8 +17,9 @@ from VO.account_vo import ChangePasswordAction, AccountAction, LoginResponse
 
 # 사용자 로그인에 필요한 데이터
 from VO.response_code import Code, MSG
+from config.config import USER_DB_PATH
 
-USER_DB = SqliteDict('./database.sqlite', autocommit=False)
+USER_DB = SqliteDict(USER_DB_PATH, autocommit=False)
 TOKEN_CACHE = diskcache.FanoutCache("./token_cache")
 
 

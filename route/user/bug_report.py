@@ -1,24 +1,15 @@
-import copy
-import re
-import secrets
-from urllib import parse
-
 import aiohttp
-import bcrypt
 import diskcache
 from fastapi import APIRouter
-from sentry_sdk import start_transaction
 from sqlitedict import SqliteDict
 from starlette.background import BackgroundTasks
 
-from settings import TELEGRAM_BOT_TOKEN, CHANNEL_ID
-from VO.account_vo import ChangePasswordAction, AccountAction
-from VO.response_code import Code, MSG
-from service.login import validate, login
-import requests
+from config.config import TELEGRAM_BOT_TOKEN, CHANNEL_ID, USER_DB_PATH
+from VO.account_vo import AccountAction
+from service.login import login
 
 router = APIRouter()
-USER_DB = SqliteDict('./database.sqlite', autocommit=False)
+USER_DB = SqliteDict(USER_DB_PATH, autocommit=False)
 TOKEN_CACHE = diskcache.FanoutCache("./token_cache")
 
 

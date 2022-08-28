@@ -1,5 +1,4 @@
 import logging
-from urllib.request import Request
 
 import sentry_sdk
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,10 +6,9 @@ from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.responses import RedirectResponse
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from starlette.templating import Jinja2Templates
 
 from route.router import api_router
-from settings import SENTRY_DSN, SENTRY_ENV, SENTRY_TRACES_SAMPLE_RATE
+from config.config import SENTRY_DSN, SENTRY_ENV, SENTRY_TRACES_SAMPLE_RATE
 
 sentry_sdk.init(
     dsn=SENTRY_DSN,

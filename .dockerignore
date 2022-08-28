@@ -1,10 +1,8 @@
+promotion_db
+user_db/database.sqlite
 venv
 .idea
 config/config.py
-user_db/database.sqlite
 qr_cache
 __py*
 token_cache
-promotion_db
-db
-cache

@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+  srtsrt:
+    image: a2345978/du-attend-v2-server:latest
+#    build: .
+    ports:
+     - "20003:8000"
+    volumes:
+      - ./db/promotion:/app/promotion_db/
+      - ./db/user:/app/user_db/
+      - ./cache/user:/app/qr_cache/
+      - ./cache/token:/app/token_cache/
+      - ./config:/app/config/

@@ -10,9 +10,10 @@ from sqlitedict import SqliteDict
 
 from VO.account_vo import ChangePasswordAction, AccountAction
 from VO.response_code import Code, MSG
+from config.config import USER_DB_PATH
 
 router = APIRouter()
-USER_DB = SqliteDict('./database.sqlite', autocommit=False)
+USER_DB = SqliteDict(USER_DB_PATH, autocommit=False)
 TOKEN_CACHE = diskcache.FanoutCache("./token_cache")
 
 

@@ -8,7 +8,7 @@ from sentry_sdk.tracing import Transaction
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from settings import KEY
+from config.config import KEY
 
 QR_DECODE_CACHE = diskcache.FanoutCache("./qr_cache")
 router = APIRouter()

@@ -16,6 +16,8 @@ from starlette.responses import Response
 from starlette.templating import Jinja2Templates
 
 from VO.account_vo import ChangePasswordAction, AccountAction
+from config.config import USER_DB_PATH
+from fluent_logger.PromoFormat import PromoLogger, ActionCode
 from route.user.account import validate
 from service.login import login
 from service.register import register
@@ -29,7 +31,7 @@ PROMO_DB = SqliteDict('./promotion_db/promo_2204.sqlite', autocommit=False)
 PROMO_LINK_DB = diskcache.Cache("./promotion_db/promo_2204_link/")
 
 # 사용자 로그인에 필요한 데이터
-USER_DB = SqliteDict('./database.sqlite', autocommit=False)
+USER_DB = SqliteDict(USER_DB_PATH, autocommit=False)
 TOKEN_CACHE = diskcache.FanoutCache("./token_cache")
 
 # 로깅 모듈
@@ -46,6 +48,8 @@ consoleHandler = logging.StreamHandler()
 consoleHandler.setFormatter(logFormatter)
 promo_logger.addHandler(consoleHandler)
 
+promo_flogger = PromoLogger
+
 
 @router.post(
     "/getImage/",
@@ -55,6 +59,15 @@ async def get_image(request: Request, action: AccountAction):
     login_result = login(action)
     if not login_result.success:
         promo_logger.warning(f"{action.std_id} {login_result.code} 로그인에 실패했습니다.")
+        PromoLogger(
+            action_code=ActionCode.GET_COUPON,
+            success=False,
+            std_id=action.std_id,
+            client_ip=request.client.host,
+            additional_data={
+                "msg": f"{action.std_id} {login_result.code} 로그인에 실패했습니다."
+            }
+        ).log()
         raise HTTPException(status_code=401)
 
     image_name = action.std_id.replace('.', '').replace("\\", "").replace("/", "")

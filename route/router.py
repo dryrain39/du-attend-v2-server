@@ -14,4 +14,4 @@ api_router.include_router(qr_decode.router, prefix='', tags=['qr_decode'])
 api_router.include_router(html.router, prefix='/static', tags=['html'])
 api_router.include_router(bug_report.router, prefix='/report', tags=['report'])
 
-api_router.include_router(promotion_22_04.router, prefix='/2204', tags=['promotion'])
+# api_router.include_router(promotion_22_04.router, prefix='/2204', tags=['promotion'])
