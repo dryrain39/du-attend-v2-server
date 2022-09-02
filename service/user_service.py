@@ -39,7 +39,7 @@ def create_user(db: Session, user: schemas.UserCreate):
 
 
 def create_user_without_hash(db: Session, user: schemas.UserCreate):
-    db_user = models.User(username=user.username, password=user.password)
+    db_user = models.User(username=user.username, password=user.password, attend_data=user.attend_data)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

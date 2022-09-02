@@ -93,12 +93,20 @@ async def account(action: AccountAction, db: Session = Depends(get_session)):
         # cache 에서 data 불러오기
         cached_data: CacheData = TOKEN_CACHE.get(f"attend_data_{action.std_id}")
         is_cache_valid = cached_data.updated_time >= jwt_token_data.updated_time
+        is_token_outdated = cached_data.updated_time > jwt_token_data.updated_time
         if (cached_data is not None) and is_cache_valid and action.type == 0:
             print(f"{is_cache_valid} {cached_data.updated_time} {jwt_token_data.updated_time}")
             # 깨진 데이터의 경우
             if cached_data.data is None or cached_data.data == "":
                 cached_data.data = "[]"
-            return {"success": True, "data": cached_data.data}
+
+            ret = {"success": True, "data": cached_data.data}
+
+            if is_token_outdated:
+                jwt_token_data.updated_time = cached_data.updated_time
+                ret["new_token"] = encode_jwt_token(jwt_token_data)
+
+            return ret
         else:
             print(f"{action.std_id} 캐시가 너무 오래됨. 또는 action type 이 1임.")
             user_info: models.User = crud.get_user_by_username(db, username=jwt_token_data.username)

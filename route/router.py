@@ -20,7 +20,7 @@ api_router.include_router(qr_decode.router, prefix='', tags=['qr_decode'])
 api_router.include_router(html.router, prefix='/static', tags=['html'])
 api_router.include_router(bug_report.router, prefix='/report', tags=['report'])
 
-api_router.include_router(user_v2.router, prefix='/account/v2', tags=['account'])
+# api_router.include_router(user_v2.router, prefix='/account/v2', tags=['account'])
 
 api_router.include_router(version.router, prefix='/version', tags=['version'])
 
