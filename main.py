@@ -1,5 +1,7 @@
 import logging
-
+import logging
+logging.basicConfig()
+logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
 import sentry_sdk
 from fastapi.middleware.cors import CORSMiddleware
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
@@ -7,6 +9,7 @@ from starlette.responses import RedirectResponse
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
+from database.db import create_db_and_tables
 from route.router import api_router
 from config.config import SENTRY_DSN, SENTRY_ENV, SENTRY_TRACES_SAMPLE_RATE
 
@@ -50,6 +53,12 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.get("/7qy38tiejfkdnojiwgu9eyhijdfk")
 async def server_checker():
     return {"message": "Hello World"}
+
+
+@app.on_event("startup")
+async def on_startup():
+    # Not needed if you setup a migration system like Alembic
+    await create_db_and_tables()
 
 
 @app.get("/")

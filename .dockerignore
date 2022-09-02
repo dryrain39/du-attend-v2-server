@@ -6,3 +6,4 @@ config/config.py
 qr_cache
 __py*
 token_cache
+config/root.crt

@@ -4,7 +4,9 @@ FROM python:3.8-alpine
 
 COPY requirements.txt /app/requirements.txt
 
-RUN apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev \
+RUN apk add postgresql-libs gcc libc-dev
+
+RUN apk add --no-cache --virtual .build-deps musl-dev libffi-dev postgresql-dev alpine-sdk \
     && pip install --no-cache-dir -r /app/requirements.txt \
     && apk del .build-deps
 

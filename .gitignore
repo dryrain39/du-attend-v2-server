@@ -8,3 +8,4 @@ token_cache
 promotion_db
 db
 cache
+config/root.crt

@@ -1,6 +1,6 @@
 version: "3.7"
 services:
-  srtsrt:
+  attend:
     image: a2345978/du-attend-v2-server:latest
 #    build: .
     ports:

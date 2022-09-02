@@ -33,6 +33,7 @@ def validate(std_id, password) -> Tuple[bool, LoginResponse]:
 
 
 def login(action: AccountAction) -> LoginResponse:
+    raise NotImplementedError()
     validate_result, msg = validate(action.std_id, action.password)
     if not validate_result:
         return msg
