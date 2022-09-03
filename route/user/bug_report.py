@@ -1,11 +1,13 @@
 import aiohttp
 import diskcache
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 from sqlitedict import SqliteDict
 from starlette.background import BackgroundTasks
 
 from config.config import TELEGRAM_BOT_TOKEN, CHANNEL_ID, USER_DB_PATH
 from VO.account_vo import AccountAction
+from database.db import get_session
 from service.login import login
 
 router = APIRouter()
@@ -14,8 +16,12 @@ TOKEN_CACHE = diskcache.FanoutCache("./token_cache")
 
 
 @router.post("/")
-async def account(action: AccountAction, background_tasks: BackgroundTasks):
-    login_result = login(action)
+async def account(
+        action: AccountAction,
+        background_tasks: BackgroundTasks,
+        db: Session = Depends(get_session)
+):
+    login_result = login(action, db)
     if not login_result.success:
         return login_result
 

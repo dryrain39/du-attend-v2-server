@@ -8,8 +8,9 @@ import shutil
 
 import bcrypt
 import diskcache
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from sentry_sdk import start_transaction, start_span
+from sqlalchemy.orm import Session
 from sqlitedict import SqliteDict
 from starlette.requests import Request
 from starlette.responses import Response
@@ -17,6 +18,7 @@ from starlette.templating import Jinja2Templates
 
 from VO.account_vo import ChangePasswordAction, AccountAction
 from config.config import USER_DB_PATH
+from database.db import get_session
 from fluent_logger.PromoFormat import PromoLogger, ActionCode
 from route.user.account import validate
 from service.login import login
@@ -55,8 +57,12 @@ promo_flogger = PromoLogger
     "/getImage/",
     response_class=Response,
 )
-async def get_image(request: Request, action: AccountAction):
-    login_result = login(action)
+async def get_image(
+        request: Request,
+        action: AccountAction,
+        db: Session = Depends(get_session)
+):
+    login_result = login(action, db)
     if not login_result.success:
         promo_logger.warning(f"{action.std_id} {login_result.code} 로그인에 실패했습니다.")
         PromoLogger(
@@ -90,9 +96,13 @@ async def promotion_result(request: Request):
 
 
 @router.post("/check/")
-async def promotion_check(request: Request, action: AccountAction):
+async def promotion_check(
+        request: Request,
+        action: AccountAction,
+        db: Session = Depends(get_session)
+):
     with start_transaction(op="promotion_2204_check", name=f"promotion_2204_check") as transaction:
-        login_result = login(action)
+        login_result = login(action, db)
         if not login_result.success:
             promo_logger.warning(f"{action.std_id} {login_result.code} 로그인에 실패했습니다.")
             return login_result
@@ -107,9 +117,13 @@ async def promotion_check(request: Request, action: AccountAction):
 
 
 @router.post("/get_code/")
-async def promotion_get_url(request: Request, action: AccountAction):
+async def promotion_get_url(
+        request: Request,
+        action: AccountAction,
+        db: Session = Depends(get_session)
+):
     with start_transaction(op="promotion_2204_make_code", name=f"promotion_2204_make_code") as transaction:
-        login_result = login(action)
+        login_result = login(action, db)
         if not login_result.success:
             promo_logger.warning(f"{action.std_id} {login_result.code} 로그인에 실패했습니다.")
             return login_result
