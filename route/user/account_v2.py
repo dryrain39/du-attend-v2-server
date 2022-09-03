@@ -149,8 +149,11 @@ async def account(action: AccountAction, db: Session = Depends(get_session)):
         user_info.attend_data = "[]"
 
     # 캐시 저장
-    TOKEN_CACHE.set(f"attend_data_{action.std_id}",
-                    CacheData(data=user_info.attend_data, updated_time=user_info.updated_time))
+    TOKEN_CACHE.set(
+        f"attend_data_{action.std_id}",
+        CacheData(data=user_info.attend_data, updated_time=user_info.updated_time),
+        expire=60 * 60 * 24
+    )
 
     return {
         "success": True,
