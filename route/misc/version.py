@@ -33,6 +33,11 @@ async def get_version():
         node = os.uname().nodename
     except:
         node = "unknown"
+
+    node_name = os.getenv("NODE_NAME", "unknown")
+    if node_name:
+        node = node_name
+
     project_name = "attend.miscthings.net"
 
     return {
