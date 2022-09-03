@@ -92,8 +92,9 @@ async def account(action: AccountAction, db: Session = Depends(get_session)):
 
         # cache 에서 data 불러오기
         cached_data: CacheData = TOKEN_CACHE.get(f"attend_data_{action.std_id}")
-        is_cache_valid = cached_data.updated_time >= jwt_token_data.updated_time
-        is_token_outdated = cached_data.updated_time > jwt_token_data.updated_time
+        is_cache_valid = cached_data and cached_data.updated_time >= jwt_token_data.updated_time
+        is_token_outdated = cached_data and cached_data.updated_time > jwt_token_data.updated_time
+
         if (cached_data is not None) and is_cache_valid and action.type == 0:
             print(f"{is_cache_valid} {cached_data.updated_time} {jwt_token_data.updated_time}")
             # 깨진 데이터의 경우
