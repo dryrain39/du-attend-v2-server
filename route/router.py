@@ -10,6 +10,7 @@ import route.user.bug_report as bug_report
 import route.user.user_v3 as user_v2
 
 import route.misc.version as version
+import route.misc.redirectRouter as redirect_router
 
 import route.promotion.promotion_22_04 as promotion_22_04
 
@@ -24,4 +25,4 @@ api_router.include_router(bug_report.router, prefix='/report', tags=['report'])
 
 api_router.include_router(version.router, prefix='/version', tags=['version'])
 
-# api_router.include_router(promotion_22_04.router, prefix='/2204', tags=['promotion'])
+api_router.include_router(redirect_router.router, prefix='/2204', tags=['promotion'])
