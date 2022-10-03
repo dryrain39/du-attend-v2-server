@@ -235,7 +235,8 @@
     function draw_classroom(classrooms) {
         $("#classroom_list").empty();
         classrooms.forEach(function (e, i) {
-            let class_name = e.name.replaceAll("<", "＜").replaceAll(">", "＞");
+            let class_name = e.name;
+            class_name = class_name? class_name.replaceAll("<", "＜").replaceAll(">", "＞") : "이름 없는"
             if (getByteB(class_name) > 16) {
                 let l = getByteB(class_name) % 2 === 0 ? 10 : 11
                 class_name = class_name.substring(0, l) + "..."
