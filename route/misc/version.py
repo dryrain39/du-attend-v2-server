@@ -7,7 +7,7 @@ router = APIRouter()
 
 @router.get("/")
 async def get_version():
-    version = "DOCKER_2022090318"
+    version = "221003"
     try:
         node = os.uname().nodename
     except:
@@ -20,5 +20,5 @@ async def get_version():
     return {
         "version": version,
         "node": node,
-        "version_string": f"서버: {node} · 버전: {version}"
+        "version_string": f"서버: {node}<br>버전: {version}_최종_진짜최종.git"
     }

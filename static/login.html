@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<div style="padding-left: 0.5em; padding-right: 0.5em">
+<div class="container mt-3" style="">
     <h1 style="text-align: center;">로그인/가입</h1>
     <hr>
 
@@ -21,37 +21,57 @@
 
     </div>
 
-    <div id="login_form" style="margin-top: 2em; margin-bottom: 2em">
-        <div class="mt-1">
-            <label for="username">학번(숫자 8자리)</label>
-            <input type="number" id="username" pattern="[0-9]*" inputmode="numeric">
-        </div>
+    <form id="login_form" style="margin-top: 2em; margin-bottom: 2em" action="" method="GET"
+          onsubmit="login(); return false;">
+        <!--        <div class="mt-1">-->
+        <!--            <label for="username">학번(숫자 8자리)</label>-->
+        <!--            <input type="number" id="username" pattern="[0-9]*" inputmode="numeric">-->
+        <!--        </div>-->
 
-        <div class="mt-1">
+        <!--        <div class="mt-1">-->
+        <!--            <label for="password">암호(4~36자리)</label>-->
+        <!--            <input type="password" id="password">-->
+        <!--        </div>-->
+
+        <!--        <div class="mt-1" id="password_repeat_div" style="display: none;">-->
+        <!--            <label for="password_repeat">암호(재입력)</label>-->
+        <!--            <input type="password" id="password_repeat">-->
+        <!--        </div>-->
+
+        <div class="form-floating mb-1">
+            <input type="number" class="form-control" id="username" placeholder="숫자8자리" pattern="[0-9]*"
+                   inputmode="numeric">
+            <label for="username">학번(숫자8자리)</label>
+        </div>
+        <div class="form-floating mb-1">
+            <input type="password" class="form-control" id="password" placeholder="4~36자리">
             <label for="password">암호(4~36자리)</label>
-            <input type="password" id="password">
         </div>
-
-        <div class="mt-1" id="password_repeat_div" style="display: none;">
+        <div class="form-floating mb-1" id="password_repeat_div" style="display: none;">
+            <input type="password" class="form-control" id="password_repeat" placeholder="4~36자리">
             <label for="password_repeat">암호(재입력)</label>
-            <input type="password" id="password_repeat">
         </div>
-    </div>
 
-    <div>
-        <ul>
-            <li>학번은 출석체크 URL을 생성하는 데 필요합니다.</li>
-            <li>암호는 서버에 <a
-                    href="https://ko.wikipedia.org/wiki/%EC%95%94%ED%98%B8%ED%99%94_%ED%95%B4%EC%8B%9C_%ED%95%A8%EC%88%98">단방향
-                해시</a>하여 저장합니다. 관리자도 해독할 수 없습니다.
-            </li>
-            <li><a href="password_reset.html" target="_blank">패스워드 분실 문의 <i class="fa-solid fa-arrow-up-right-from-square"></i></a></li>
-        </ul>
-    </div>
+        <div>
+            <ul>
+                <li>학번은 출석체크 URL을 생성하는 데 필요합니다.</li>
+                <li>암호는 서버에 <a
+                        href="https://ko.wikipedia.org/wiki/%EC%95%94%ED%98%B8%ED%99%94_%ED%95%B4%EC%8B%9C_%ED%95%A8%EC%88%98">단방향
+                    해시</a>하여 저장합니다. 관리자도 해독할 수 없습니다.
+                </li>
+                <li><a href="password_reset.html" target="_blank">패스워드 분실 문의 <i
+                        class="fa-solid fa-arrow-up-right-from-square"></i></a></li>
+            </ul>
+        </div>
 
-    <div>
-        <button id="login_btn" onclick="login()" style="width: 100%;">로그인/가입</button>
-    </div>
+        <div>
+            <button class="btn btn-outline-success" id="login_btn" type="submit" onclick="login()" style="width: 100%;">
+                로그인/가입
+            </button>
+        </div>
+    </form>
+
+
 </div>
 
 {% include 'fragment/footer.html' %}
@@ -112,11 +132,11 @@
                         trylogin.attr("disabled", false);
                         return;
                     }
-                }else{
+                } else {
                     localStorage.setItem("login_id", $("#username").val())
                     localStorage.setItem("password", $("#password").val())
 
-                    if(data.new_token){
+                    if (data.new_token) {
                         localStorage.setItem("password", data.new_token)
                     }
 
@@ -127,9 +147,9 @@
     }
 
     $(document).ready(async function () {
-        try{
+        try {
             await detect_api_server();
-        }catch (e) {
+        } catch (e) {
 
         }
     })

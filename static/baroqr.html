@@ -9,12 +9,12 @@
 </head>
 <body>
 
-<div>
+<div class="container mt-3">
     <h1 style="text-align: center;">바로출석</h1>
     <hr>
 
     <div class="f18" style="margin-top: 1em; margin-bottom: 1em; text-align: center;">
-        <span style="font-weight: bold" id="alert" >카메라 권한을 허용해 주세요!</span>
+        <span style="font-weight: bold" id="alert">카메라 권한을 허용해 주세요!</span>
     </div>
 
     <div id="CameraSelect">
@@ -54,15 +54,15 @@
 
     function classroom_data(push, data) {
         let type = 0
-        if(push){
+        if (push) {
             type = 1
         }
-        if(!data){
+        if (!data) {
             data = ""
         }
 
         return new Promise(function (resolve, reject) {
-            if(localStorage.getItem("login_id") && localStorage.getItem("password")){
+            if (localStorage.getItem("login_id") && localStorage.getItem("password")) {
                 $.ajax({
                     method: "POST",
                     url: SERVER_ADDRESS + "account/action",
@@ -79,14 +79,14 @@
                             window.location = "login.html"
                         }
 
-                        $(".login_id").each(function() {
+                        $(".login_id").each(function () {
                             $(this).html(localStorage.getItem("login_id"))
                         })
 
                         resolve(data.data)
                     },
                 });
-            }else{
+            } else {
                 window.location = "login.html"
             }
         })
@@ -94,6 +94,11 @@
 
 
     $(document).ready(async function () {
+        var ua = navigator.userAgent.toLowerCase(); //userAgent 값 얻기
+        if (ua.indexOf('kakaotalk') > -1) {
+            alert("잠깐!!!!!!!!\n카카오톡 브라우저를 사용하고 계시네요.\n카메라 지원이 안될 수 있습니다. 주소를 복사해서 기본 브라우저를 사용해주세요.\n양해해 주셔서 감사합니다.")
+        }
+
         await detect_api_server();
         await classroom_data();
         await addFromQR();
@@ -109,7 +114,7 @@
         this[b] = temp;
     };
 
-    function doneReadQR(){
+    function doneReadQR() {
         $("#reader").html(`<button style="width: 100%;" onclick="addFromQR();">다시 인식하기</button>`)
     }
 

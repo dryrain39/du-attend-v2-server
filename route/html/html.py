@@ -25,6 +25,15 @@ async def index_html(request: Request):
         })
 
 
+@router.get("/search.html")
+async def search_html(request: Request):
+    with start_transaction(op="search_html", name=f"search_html") as transaction:
+        return templates.TemplateResponse("search.html", {
+            "trace": transaction.to_traceparent(),
+            "request": request
+        })
+
+
 @router.get("/baroqr.html")
 async def baroqr_html(request: Request):
     with start_transaction(op="baroqr_html", name=f"baroqr_html") as transaction:

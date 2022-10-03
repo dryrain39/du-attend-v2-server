@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="sentry-trace" content="{{ trace }}"/>
-    <title>DU Attend v2</title>
+    <title>DU Search v1</title>
 
+    <link rel="stylesheet" href="/static/lib/bootstrap.css">
     {% include 'fragment/header.html' %}
     <!--    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>-->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
             integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
             crossorigin="anonymous"></script>
-    <script src="/static/js/bootstrap.min.js"
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
 
 
@@ -19,11 +21,11 @@
 <body>
 
 <div class="container mt-3">
-    <h1 style="text-align: center;">DU Attend V2</h1>
+    <h1 style="text-align: center;">DU Search V1</h1>
     <hr>
 
     <div role="search">
-        <form action="search.html" method="get" onclick="location.href = 'search.html';">
+        <form action="" method="get">
             <div class="input-group mb-3">
                 <input type="text" class="form-control" placeholder="무엇이든 찾아보세요" aria-label="검색창" name="search"
                        aria-describedby="search_btn">
@@ -52,7 +54,9 @@
 
     <div role="banner">
         <div style="" class="mt-3 mb-3">
-            {% include 'fragment/banner_new.html' %}
+            {% include 'fragment/banner_search.html' %}
+
+
         </div>
     </div>
 
@@ -65,47 +69,29 @@
 
         </div>
 
-        <div id="classroom_list" class="mb-3" style=" ">
+        <div id="search_list" class="mb-3" style=" ">
+            <div class="card mb-2 ">
+                <div class="hstack gap-2 mt-3" style="font-size: 1.2em;" role="button">
+<!--                     onclick="location.href='${url}';">-->
+                    <div class="ms-3">
+                        <span><span class="badge bg-secondary">안내</span> 오픈 준비중</span>
+                    </div>
+                    <div class="ms-auto me-3">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </div>
 
-            <!--            <div style="margin-bottom: 1em;">-->
-            <!--                <span class="f18"><span>${e.name}</span> 강의실 <br></span>-->
-            <!--                <span class="f16">→</span>-->
-            <!--                <a class="attend_lnk f16" href="${url}">출석</a> 또는-->
-            <!--                <a id="editdig-trigger" href="#" class="f16" onclick="renameclassroom(${i})">편집</a> 또는-->
-            <!--                <a id="editdig-trigger" href="#" class="f16" onclick="deleteclassroom(${i})">삭제</a>-->
-            <!--            </div>-->
+                <div class="card-body">
+
+                    <b>새로운 검색 기능을 준비하고 있습니다.</b> <br>
+                    DU Attend V2 내에서 검색 창 하나로 학사공지, 에브리타임, 장학재단, 연락처 검색, 버스정보 검색 등 다양한 정보를 한번에 검색할 수 있는 기능을 기획중입니다.<br>
+                    또한 꼭 필요한 기능이 있는경우 의견란을 통해 남겨주시면 적극 반영하도록 하겠습니다
+
+                </div>
+            </div>
         </div>
 
         <nav role="navigation" style="margin-bottom: 2em;">
-            <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(176,196,222,0.15)"
-                 onclick="location.href='qr.html'" role="button">
-                <div class="ms-4 mt-2 mb-2">
-                    <span><i class="fa-solid fa-plus"></i>&nbsp; 강의실 추가</span>
-                </div>
-                <!--                <div class="ms-auto me-4">-->
-                <!--                    <i class="fa-solid fa-plus"></i>-->
-                <!--                </div>-->
-            </div>
-
-            <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(176,196,222,0.15)"
-                 onclick="location.href='baroqr.html'" role="button">
-                <div class="ms-4 mt-2 mb-2">
-                    <span><i class="fa-solid fa-qrcode"></i>&nbsp; 바로출석</span>
-                </div>
-                <!--                <div class="ms-auto me-4">-->
-                <!--                    <i class="fa-solid fa-qrcode"></i>-->
-                <!--                </div>-->
-            </div>
-
-            <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(176,196,222,0.15)"
-                 onclick="location.href='user.html'" role="button">
-                <div class="ms-4 mt-2 mb-2">
-                    <span><i class="fa-solid fa-gear"></i>&nbsp; 강의실 편집·사용자 설정</span>
-                </div>
-                <!--                <div class="ms-auto me-4">-->
-                <!--                    <i class="fa-solid fa-gear"></i>-->
-                <!--                </div>-->
-            </div>
 
             <div class="card mb-2 mt-3 hstack gap-2" style="font-size: 1.4em; background-color: rgba(222,176,187,0.1)"
                  onclick="location.href='report.html'" role="button">
@@ -114,19 +100,19 @@
                 </div>
             </div>
 
-            <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(222,176,187,0.1)"
-                 onclick="location.href='introduce.html'" role="button">
-                <div class="ms-4 mt-2 mb-2">
-                    <span><i class="fa-regular fa-circle-question"></i>&nbsp; 사용법</span>
-                </div>
-            </div>
+<!--            <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(222,176,187,0.1)"-->
+<!--                 onclick="location.href='introduce.html'" role="button">-->
+<!--                <div class="ms-4 mt-2 mb-2">-->
+<!--                    <span><i class="fa-regular fa-circle-question"></i>&nbsp; 사용법</span>-->
+<!--                </div>-->
+<!--            </div>-->
 
-            <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(222,176,187,0.1)"
-                 onclick="location.href='https://miscthings.net'" role="button">
-                <div class="ms-4 mt-2 mb-2">
-                    <span><i class="fa-solid fa-people-group"></i>&nbsp; MiscThings 소개</span>
-                </div>
-            </div>
+<!--            <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(222,176,187,0.1)"-->
+<!--                 onclick="location.href='https://miscthings.net'" role="button">-->
+<!--                <div class="ms-4 mt-2 mb-2">-->
+<!--                    <span><i class="fa-solid fa-people-group"></i>&nbsp; MiscThings 소개</span>-->
+<!--                </div>-->
+<!--            </div>-->
 
         </nav>
     </main>
@@ -150,7 +136,8 @@
     }
 
     function alert_nd() {
-        alert(`[출석 하기] → 강의실 이름을 클릭하면 출석 페이지로 이동됩니다.\n[강의실 수정·삭제] → 목록 하단 사용자 설정 메뉴에 있습니다.`);
+        alert(`- 출석 하기 → 강의실 이름을 클릭하면 출석 페이지로 이동됩니다.
+- 각종 기능 버튼은 전부 강의실 목록 하단으로 이동하였습니다`);
     }
 
     function detect_api_server() {
@@ -246,14 +233,14 @@
             }
 
             let url = SERVER_ADDRESS + `attend_url?std_id=${localStorage.getItem("login_id")}&qr_string=${e.qr_string}`
-            $("#classroom_list").append(`<div class="card mb-2 hstack gap-2" style="font-size: 1.8em;" role="button" onclick="location.href='${url}';">
+            $("#classroom_list").append(`<a class="card mb-2 hstack gap-2" style="font-size: 1.8em;" role="button" onclick="location.href='${url}';">
                 <div class="ms-4 mt-2 mb-2">
                     <span>${class_name}</span>
                 </div>
                 <div class="ms-auto me-4">
                     <i class="fa-solid fa-arrow-right"></i>
                 </div>
-            </div>`)
+            </a>`)
             //     $("#classroom_list").append(`<div style="margin-bottom: 1em;" >
             //     <span class="f18"><span>${e.name}</span> 강의실 <br></span>
             //     <span class="f16">→</span>
@@ -270,13 +257,13 @@
         } catch (e) {
 
         }
-        classrooms = await classroom_data();
-        try {
-            classrooms = JSON.parse(classrooms);
-        } catch (e) {
-            classrooms = [];
-        }
-        draw_classroom(classrooms);
+        // classrooms = await classroom_data();
+        // try {
+        //     classrooms = JSON.parse(classrooms);
+        // } catch (e) {
+        //     classrooms = [];
+        // }
+        // draw_classroom(classrooms);
     })
 </script>
 

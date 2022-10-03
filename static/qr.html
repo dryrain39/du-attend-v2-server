@@ -9,12 +9,12 @@
 </head>
 <body>
 
-<div>
+<div class="container mt-3">
     <h1 style="text-align: center;">강의실 추가</h1>
     <hr>
 
     <div class="f18" style="margin-top: 1em; margin-bottom: 1em; text-align: center;">
-        <span style="font-weight: bold" id="alert" >카메라 권한을 허용해 주세요!</span>
+        <span style="font-weight: bold" id="alert">카메라 권한을 허용해 주세요!</span>
     </div>
 
     <div id="CameraSelect">
@@ -48,7 +48,7 @@
     let qrCodeData = "";
     let SERVER_ADDRESS = "//attend.miscthings.net/"
 
-    function change_classroom_name(){
+    function change_classroom_name() {
         classroomName = prompt("강의실 이름을 입력해주세요.", classroomName);
         $("#classRoomName").html(classroomName);
     }
@@ -72,15 +72,15 @@
 
     function classroom_data(push, data) {
         let type = 0
-        if(push){
+        if (push) {
             type = 1
         }
-        if(!data){
+        if (!data) {
             data = ""
         }
 
         return new Promise(function (resolve, reject) {
-            if(localStorage.getItem("login_id") && localStorage.getItem("password")){
+            if (localStorage.getItem("login_id") && localStorage.getItem("password")) {
                 $.ajax({
                     method: "POST",
                     url: SERVER_ADDRESS + "account/action",
@@ -97,20 +97,24 @@
                             window.location = "login.html"
                         }
 
-                        $(".login_id").each(function() {
+                        $(".login_id").each(function () {
                             $(this).html(localStorage.getItem("login_id"))
                         })
+
+                        if (data.new_token) {
+                            localStorage.setItem("password", data.new_token)
+                        }
 
                         resolve(data.data)
                     },
                 });
-            }else{
+            } else {
                 window.location = "login.html"
             }
         })
     }
 
-    async function save(){
+    async function save() {
         let savebtn = $("#save_btn")
 
         savebtn.attr("disabled", true)
@@ -119,9 +123,14 @@
         let clsdata = await classroom_data();
         try {
             clsdata = JSON.parse(clsdata);
-        }catch (e) {
-            console.log("디코드에 실패했습니다...", {clsdata})
-            clsdata = []
+        } catch (e) {
+            alert("데이터 읽기 실패! 하단 문의사항에 연락처 남겨주세요! 회원ID:" + localStorage.getItem("login_id") + " 에러코드:" + e + " 복구데이터:" + clsdata)
+            error("데이터 읽기 실패! 회원ID:" + localStorage.getItem("login_id") + " 에러코드:" + e + " 복구데이터:" + clsdata)
+            let url = SERVER_ADDRESS + `attend_url?std_id=${localStorage.getItem("login_id")}&qr_string=${qrCodeData}`
+            setTimeout(function () {
+                window.location.replace(url);
+            }, 2000)
+            return;
         }
 
         clsdata.push({
@@ -136,6 +145,11 @@
     }
 
     $(document).ready(async function () {
+        var ua = navigator.userAgent.toLowerCase(); //userAgent 값 얻기
+        if (ua.indexOf('kakaotalk') > -1) {
+            alert("잠깐!!!!!!!!\n카카오톡 브라우저를 사용하고 계시네요.\n카메라 지원이 안될 수 있습니다. 주소를 복사해서 기본 브라우저를 사용해주세요.\n양해해 주셔서 감사합니다.")
+        }
+
         await detect_api_server();
         await classroom_data();
         await addFromQR();
@@ -151,7 +165,7 @@
         this[b] = temp;
     };
 
-    function doneReadQR(){
+    function doneReadQR() {
         $("#reader").html(`<button style="width: 100%;" onclick="addFromQR();">다시 인식하기</button>`)
     }
 
@@ -271,6 +285,42 @@
                     html5QrCode.stop();
                 });
         })
+    }
+
+    async function check_if_classroom_length_change() {
+        let len = classrooms.length;
+        await update_classroom();
+        return len !== classrooms.length
+    }
+
+    async function update_classroom() {
+        classrooms = await classroom_data();
+        try {
+            classrooms = JSON.parse(classrooms);
+        } catch (e) {
+            classrooms = [];
+        }
+        draw_classroom(classrooms);
+    }
+
+    function error(text) {
+        if (localStorage.getItem("login_id") && localStorage.getItem("password")) {
+            $.ajax({
+                method: "POST",
+                url: "/report/",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    std_id: localStorage.getItem("login_id"),
+                    password: localStorage.getItem("password"),
+                    type: 0,
+                    data: text,
+                    account_register: false
+                }),
+                success: function (data) {
+
+                },
+            });
+        }
     }
 </script>
 

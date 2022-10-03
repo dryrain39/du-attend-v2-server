@@ -5,6 +5,7 @@
     <meta name="sentry-trace" content="{{ trace }}"/>
     <title>DU Attend v2 - 내정보</title>
     {% include 'fragment/header.html' %}
+    <script src="/static/lib/qrshow.js"></script>
     <style>
         .mt-1 {
             margin-top: 1em;
@@ -13,53 +14,110 @@
 </head>
 <body>
 
-<div style="padding-left: 0.5em; padding-right: 0.5em">
-    <h1 style="text-align: center;">회원정보</h1>
+<div class="container mt-3" style="">
+    <h1 style="text-align: center;">설정</h1>
     <hr>
 
-    <div class="f18" id="alert">
 
-    </div>
+    <div class="mt-3">
+        <h2>강의실 수정</h2>
 
-    <div id="login_form" style="margin-top: 2em; margin-bottom: 2em">
-        <div class="mt-1">
-            <label for="username">학번(숫자 8자리)</label>
-            <input type="text" id="username" disabled>
-        </div>
-
-        <div class="mt-1">
-            <label for="password">암호(4~36자리)</label>
-            <input type="password" id="password">
-        </div>
-
-        <div class="mt-1" id="password_new_div">
-            <label for="password_new">새 암호(4~36자리)</label>
-            <input type="password" id="password_new">
+        <div id="classroom_list" class="mb-3" style=" ">
         </div>
     </div>
 
-    <div>
-        <ul>
-            <li>학번은 변경할 수 없습니다.</li>
-            <li>학번은 출석체크 URL을 생성하는 데 필요합니다.</li>
-            <li>암호는 서버에 <a target="_blank"
-                    href="https://ko.wikipedia.org/wiki/%EC%95%94%ED%98%B8%ED%99%94_%ED%95%B4%EC%8B%9C_%ED%95%A8%EC%88%98">단방향
-                해시</a>하여 저장합니다.
-            </li>
-            <li>암호 변경 없이 다른 기기에서 로그아웃하려면 새 암호 칸에 기존 암호를 입력하세요.</li>
-        </ul>
-    </div>
 
-    <div>
-        <button id="login_btn" onclick="change_password()" style="width: 100%;">비밀번호 변경</button>
-        <button id="logout_btn" onclick="logout()" style="width: 100%;">로그아웃</button>
+    <div class="mt-5">
+        <h2>회원정보 수정</h2>
+
+        <div class="f18" id="alert">
+
+        </div>
+
+
+        <div id="login_form" style="">
+
+
+            <div class="form-floating mb-1">
+                <input type="number" class="form-control" id="username" placeholder="숫자8자리" disabled>
+                <label for="username">학번</label>
+            </div>
+            <div class="form-floating mb-1">
+                <input type="password" class="form-control" id="password" placeholder="4~36자리">
+                <label for="password">암호</label>
+            </div>
+            <div class="form-floating mb-1" id="password_new_div">
+                <input type="password" class="form-control" id="password_new" placeholder="4~36자리">
+                <label for="password_new">새 암호</label>
+            </div>
+
+
+            <!--        <div class="mt-1">-->
+            <!--            <label for="username">학번(숫자 8자리)</label>-->
+            <!--            <input type="text" id="username" disabled>-->
+            <!--        </div>-->
+
+            <!--        <div class="mt-1">-->
+            <!--            <label for="password">암호(4~36자리)</label>-->
+            <!--            <input type="password" id="password">-->
+            <!--        </div>-->
+
+            <!--        <div class="mt-1" id="password_new_div">-->
+            <!--            <label for="password_new">새 암호(4~36자리)</label>-->
+            <!--            <input type="password" id="password_new">-->
+            <!--        </div>-->
+        </div>
+
+        <div>
+            <ul>
+                <li>학번은 변경할 수 없습니다.</li>
+                <li>학번은 출석체크 URL을 생성하는 데 필요합니다.</li>
+                <li>암호는 서버에 <a target="_blank"
+                               href="https://ko.wikipedia.org/wiki/%EC%95%94%ED%98%B8%ED%99%94_%ED%95%B4%EC%8B%9C_%ED%95%A8%EC%88%98">단방향
+                    해시</a>하여 저장합니다.
+                </li>
+                <li>암호 변경 없이 다른 기기에서 로그아웃하려면 새 암호 칸에 기존 암호를 입력하세요.</li>
+            </ul>
+        </div>
+
+        <div>
+            <button class="btn btn-outline-secondary" id="login_btn" onclick="change_password()" style="width: 100%;">
+                비밀번호
+                변경
+            </button>&nbsp;
+            <button class="btn btn-outline-danger" id="logout_btn" onclick="logout()" style="width: 100%;">로그아웃</button>
+        </div>
     </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal_class_name">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" style="text-align: center">
+        <div id="qrcode" style="width: 100%;"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% include 'fragment/footer.html' %}
 
 <script>
+    let classrooms = [];
     let SERVER_ADDRESS = "//attend.miscthings.net/"
+
+    function getByteB(str) {
+        var byte = 0;
+        for (var i = 0; i < str.length; ++i) {
+            (str.charCodeAt(i) > 127) ? byte += 2 : byte++;
+        }
+        return byte;
+    }
 
     function detect_api_server() {
         return new Promise(function (resolve, reject) {
@@ -79,13 +137,13 @@
     }
 
 
-    function logout(){
+    function logout() {
         localStorage.setItem("password", "")
         window.location = "index.html"
     }
 
 
-    function classroom_data(push, data) {
+    async function classroom_data(push, data) {
         let type = 0
         if (push) {
             type = 1
@@ -105,7 +163,8 @@
                         password: localStorage.getItem("password"),
                         type: type,
                         data: data,
-                        account_register: false
+                        account_register: false,
+                        force_new_data: true
                     }),
                     success: function (data) {
                         if (!data.success) {
@@ -114,7 +173,7 @@
 
                         $("#username").val(localStorage.getItem("login_id"))
 
-                        if(data.new_token){
+                        if (data.new_token) {
                             localStorage.setItem("password", data.new_token)
                         }
 
@@ -126,6 +185,103 @@
             }
         })
     }
+
+    async function check_if_classroom_length_change(){
+        let len = classrooms.length;
+        await update_classroom();
+        return len !== classrooms.length
+    }
+
+    async function deleteclassroom(idx) {
+        if (confirm("정말 삭제하시겠습니까?")) {
+
+            if(await check_if_classroom_length_change()) {
+                alert("다른 기기에서 정보 변경이 감지되었습니다. 다시 시도해 주십시오.")
+                return
+            }
+
+            classrooms.splice(idx, 1);
+            await classroom_data(1, JSON.stringify(classrooms));
+            await draw_classroom(classrooms);
+        }
+    }
+
+    async function renameclassroom(idx) {
+        let original_name = classrooms[idx].name
+        let new_name = prompt("새 이름을 입력해 주십시오.", original_name);
+        if (new_name != null) {
+            if(await check_if_classroom_length_change()) {
+                alert("다른 기기에서 정보 변경이 감지되었습니다. 다시 시도해 주십시오.")
+                return
+            }
+
+            classrooms[idx].name = new_name;
+            await classroom_data(1, JSON.stringify(classrooms));
+            await draw_classroom(classrooms);
+        }
+    }
+
+    async function qrshow(idx) {
+        let qrstring = classrooms[idx].qr_string
+        let qrcode = $("#qrcode");
+        $("#modal_class_name").html(classrooms[idx].name);
+        qrcode.html("");
+        new QRCode(document.getElementById("qrcode"), qrstring);
+
+        $('#qrModal').modal('show');
+    }
+
+
+    function draw_classroom(classrooms) {
+        $("#classroom_list").empty();
+        classrooms.forEach(function (e, i) {
+            let class_name = e.name;
+            if (getByteB(class_name) > 16) {
+                let l = getByteB(class_name) % 2 === 0 ? 10 : 11
+                class_name = class_name.substring(0, l) + "..."
+            } else {
+                class_name = class_name + " 강의실"
+            }
+
+            let url = SERVER_ADDRESS + `attend_url?std_id=${localStorage.getItem("login_id")}&qr_string=${e.qr_string}`
+            $("#classroom_list").append(`<div class="card mb-2 hstack gap-3" style="font-size: 1.2em;" role="button">
+                <div class="ms-3 mt-2 mb-2">
+                    <span>${class_name}</span>
+                </div>
+                <div class="ms-auto " onclick="qrshow(${i})">
+                    <i class="fa-solid fa-qrcode"></i>
+                    </div>
+                <div class="" onclick="renameclassroom(${i})">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+                <div class="me-3"  onclick="deleteclassroom(${i})">
+                    <i class="fa-solid fa-trash"></i>
+                </div>
+            </div>`)
+            //     $("#classroom_list").append(`<div style="margin-bottom: 1em;" >
+            //     <span class="f18"><span>${e.name}</span> 강의실 <br></span>
+            //     <span class="f16">→</span>
+            //     <a class="attend_lnk f16" href="${url}">출석</a> 또는
+            //     <a id="editdig-trigger" href="#" class="f16" onclick="renameclassroom(${i})">편집</a> 또는
+            //     <a id="editdig-trigger" href="#" class="f16" onclick="deleteclassroom(${i})">삭제</a>
+            // </div>`)
+        })
+    }
+
+    $(document).ready(async function () {
+        try {
+            await detect_api_server();
+        } catch (e) {
+
+        }
+        classrooms = await classroom_data();
+        try {
+            classrooms = JSON.parse(classrooms);
+        } catch (e) {
+            classrooms = [];
+        }
+        draw_classroom(classrooms);
+    })
 
 
     async function change_password() {
@@ -154,11 +310,11 @@
                         trylogin.attr("disabled", false);
                         return;
                     }
-                }else{
+                } else {
                     localStorage.setItem("login_id", $("#username").val())
                     localStorage.setItem("password", $("#password").val())
 
-                    if(data.new_token){
+                    if (data.new_token) {
                         localStorage.setItem("password", data.new_token)
                     }
 
@@ -169,13 +325,24 @@
     }
 
     $(document).ready(async function () {
-        try{
+        try {
             await detect_api_server();
-            await classroom_data();
-        }catch (e) {
+        } catch (e) {
 
         }
+
+        update_classroom();
     })
+
+    async function update_classroom(){
+        classrooms = await classroom_data();
+        try {
+            classrooms = JSON.parse(classrooms);
+        } catch (e) {
+            classrooms = [];
+        }
+        draw_classroom(classrooms);
+    }
 
 </script>
 

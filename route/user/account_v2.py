@@ -95,6 +95,10 @@ async def account(action: AccountAction, db: Session = Depends(get_session)):
         is_cache_valid = cached_data and cached_data.updated_time >= jwt_token_data.updated_time
         is_token_outdated = cached_data and cached_data.updated_time > jwt_token_data.updated_time
 
+        # 강제로 데이터를 요청한경우 캐시 만료시킴
+        if action.force_new_data:
+            is_cache_valid = False
+
         if (cached_data is not None) and is_cache_valid and action.type == 0:
             print(f"{is_cache_valid} {cached_data.updated_time} {jwt_token_data.updated_time}")
             # 깨진 데이터의 경우

@@ -9,6 +9,7 @@ class AccountAction(BaseModel):
     type: int  # 1: modify data
     data: Optional[str] = ""
     account_register: Optional[bool] = None
+    force_new_data: Optional[bool] = None
 
 
 class ChangePasswordAction(BaseModel):
