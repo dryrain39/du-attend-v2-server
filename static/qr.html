@@ -35,7 +35,7 @@
     <!--    </div>-->
 
     <div>
-        <button id="save_btn" onclick="save()" style="width: 100%; display: none">강의실 저장</button>
+        <button id="save_btn" class="btn-outline-secondary btn" onclick="save()" style="width: 100%; display: none">강의실 저장</button>
     </div>
 </div>
 
@@ -166,7 +166,7 @@
     };
 
     function doneReadQR() {
-        $("#reader").html(`<button style="width: 100%;" onclick="addFromQR();">다시 인식하기</button>`)
+        $("#reader").html(`<button class="btn-outline-secondary btn" style="width: 100%;" onclick="addFromQR();">다시 인식하기</button>`)
     }
 
     function listCamera() {
@@ -175,9 +175,9 @@
 
         for (let i = 0; i < cameraList.length; i++) {
             if (i === 0) {
-                camSelect.append(`<button class="camera-btn" onclick="">✓ ${cameraList[i].label}</button>`)
+                camSelect.append(`<button class="camera-btn btn-outline-secondary" onclick="">✓ ${cameraList[i].label}</button>`)
             } else {
-                camSelect.append(`<button class="camera-btn" onclick="selectCamera(${i})">${cameraList[i].label}</button>`)
+                camSelect.append(`<button class="camera-btn btn-outline-secondary" onclick="selectCamera(${i})">${cameraList[i].label}</button>`)
             }
         }
     }
