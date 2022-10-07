@@ -149,10 +149,6 @@
         return byte;
     }
 
-    function alert_nd() {
-        alert(`[출석 하기] → 강의실 이름을 클릭하면 출석 페이지로 이동됩니다.\n[강의실 수정·삭제] → 목록 하단 사용자 설정 메뉴에 있습니다.`);
-    }
-
     function detect_api_server() {
         return new Promise(function (resolve, reject) {
             $.ajax({
@@ -234,8 +230,7 @@
 
 
     function draw_classroom(classrooms) {
-        // todo remove on production
-        // $("#classroom_list").empty();
+        $("#classroom_list").empty();
         classrooms.forEach(function (e, i) {
             let class_name = e.name;
             class_name = class_name? class_name.replaceAll("<", "＜").replaceAll(">", "＞") : "이름 없는"

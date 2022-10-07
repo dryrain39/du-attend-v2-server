@@ -207,13 +207,15 @@
     }
 
     async function renameclassroom(idx) {
-        let original_name = classrooms[idx].name
+        let original_name = classrooms[idx].name? classrooms[idx].name : "이름 없는";
         let new_name = prompt("새 이름을 입력해 주십시오.", original_name);
         if (new_name != null) {
             if(await check_if_classroom_length_change()) {
                 alert("다른 기기에서 정보 변경이 감지되었습니다. 다시 시도해 주십시오.")
                 return
             }
+
+            console.log(new_name);
 
             classrooms[idx].name = new_name;
             await classroom_data(1, JSON.stringify(classrooms));

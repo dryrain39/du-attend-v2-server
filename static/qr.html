@@ -50,6 +50,9 @@
 
     function change_classroom_name() {
         classroomName = prompt("강의실 이름을 입력해주세요.", classroomName);
+        if(classroomName === null) {
+            classroomName = "";
+        }
         $("#classRoomName").html(classroomName);
     }
 
@@ -131,6 +134,10 @@
                 window.location.replace(url);
             }, 2000)
             return;
+        }
+
+        if(classroomName === null || classroomName === undefined || classroomName === "") {
+            classroomName = "이름 없는";
         }
 
         clsdata.push({
