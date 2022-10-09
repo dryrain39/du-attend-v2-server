@@ -336,7 +336,7 @@
         tmp = items[index].split("=");
         if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
     }
-    return result;
+    return result.replace(/%20/g, " ").replace(/[%2B|+]/g, " ");
 }
 
     $(document).ready(async function () {
