@@ -16,6 +16,11 @@
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
 
+    <style>
+        #search_list b {
+            color: #6c0055;
+        }
+    </style>
 
 </head>
 <body>
@@ -25,11 +30,11 @@
     <hr>
 
     <div role="search">
-        <form action="" method="get">
+        <form action="" method="get" onsubmit="" id="sch_form">
             <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="무엇이든 찾아보세요" aria-label="검색창" name="search"
-                       aria-describedby="search_btn">
-                <button class="btn btn-outline-secondary" type="button" id="clear_btn" aria-label="초기화"><i
+                <input type="text" class="form-control" placeholder="무엇이든 찾아보세요" aria-label="검색창" name="q"
+                       aria-describedby="search_btn" id="search_input">
+                <button class="btn btn-outline-secondary" type="reset" id="clear_btn" aria-label="초기화"><i
                         class="fa-solid fa-times"></i></button>
                 <button class="btn btn-outline-success" type="submit" id="search_btn" aria-label="검색"><i
                         class="fa-solid fa-magnifying-glass"></i></button>
@@ -72,23 +77,34 @@
         <div id="search_list" class="mb-3" style=" ">
             <div class="card mb-2 ">
                 <div class="hstack gap-2 mt-3" style="font-size: 1.2em;" role="button">
-<!--                     onclick="location.href='${url}';">-->
+                    <!--                     onclick="location.href='${url}';">-->
                     <div class="ms-3">
-                        <span><span class="badge bg-secondary">안내</span> 오픈 준비중</span>
-                    </div>
-                    <div class="ms-auto me-3">
-                        <i class="fa-solid fa-arrow-right"></i>
+                        <span><span class="badge bg-secondary">안내</span> 베타 진행중</span>
                     </div>
                 </div>
 
                 <div class="card-body">
 
                     <b>새로운 검색 기능을 준비하고 있습니다.</b> <br>
-                    DU Attend V2 내에서 검색 창 하나로 학사공지, 에브리타임, 장학재단, 연락처 검색, 버스정보 검색 등 다양한 정보를 한번에 검색할 수 있는 기능을 기획중입니다.<br>
+                    검색 가능:
+                    <ul>
+                        <li>학사공지</li>
+                        <li>연락처 검색(번호 뒷자리, 초성, 부서 검색 지원)</li>
+                    </ul>
+
+                    추후 추가되는 기능:
+                    <ul>
+                        <li>학과공지(각 단대)</li>
+                        <li>에브리타임</li>
+                        <li>장학재단</li>
+                        <li>실시간 버스정보</li>
+                    </ul>
+                    <br>
                     또한 꼭 필요한 기능이 있는경우 의견란을 통해 남겨주시면 적극 반영하도록 하겠습니다
 
                 </div>
             </div>
+
         </div>
 
         <nav role="navigation" style="margin-bottom: 2em;">
@@ -100,19 +116,19 @@
                 </div>
             </div>
 
-<!--            <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(222,176,187,0.1)"-->
-<!--                 onclick="location.href='introduce.html'" role="button">-->
-<!--                <div class="ms-4 mt-2 mb-2">-->
-<!--                    <span><i class="fa-regular fa-circle-question"></i>&nbsp; 사용법</span>-->
-<!--                </div>-->
-<!--            </div>-->
+            <!--            <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(222,176,187,0.1)"-->
+            <!--                 onclick="location.href='introduce.html'" role="button">-->
+            <!--                <div class="ms-4 mt-2 mb-2">-->
+            <!--                    <span><i class="fa-regular fa-circle-question"></i>&nbsp; 사용법</span>-->
+            <!--                </div>-->
+            <!--            </div>-->
 
-<!--            <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(222,176,187,0.1)"-->
-<!--                 onclick="location.href='https://miscthings.net'" role="button">-->
-<!--                <div class="ms-4 mt-2 mb-2">-->
-<!--                    <span><i class="fa-solid fa-people-group"></i>&nbsp; MiscThings 소개</span>-->
-<!--                </div>-->
-<!--            </div>-->
+            <!--            <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(222,176,187,0.1)"-->
+            <!--                 onclick="location.href='https://miscthings.net'" role="button">-->
+            <!--                <div class="ms-4 mt-2 mb-2">-->
+            <!--                    <span><i class="fa-solid fa-people-group"></i>&nbsp; MiscThings 소개</span>-->
+            <!--                </div>-->
+            <!--            </div>-->
 
         </nav>
     </main>
@@ -124,7 +140,6 @@
 
 
 <script>
-    let SERVER_ADDRESS = "//attend.miscthings.net/"
     let classrooms = [];
 
     function getByteB(str) {
@@ -135,125 +150,200 @@
         return byte;
     }
 
-    function alert_nd() {
-        alert(`- 출석 하기 → 강의실 이름을 클릭하면 출석 페이지로 이동됩니다.
-- 각종 기능 버튼은 전부 강의실 목록 하단으로 이동하였습니다`);
+    function get_time_string(date) {
+        let today = new Date(date);
+        today.setHours(today.getHours() + 9);
+        return today.toISOString().replace('T', ' ').substring(0, 19) + " KST";
     }
 
-    function detect_api_server() {
-        return new Promise(function (resolve, reject) {
+    function get_search_element_html(id, badge, title, date, content, url, highlight_word_list, tags) {
+        let content_string = content;
+        let start_tag = "<b>";
+        let end_tag = "</b>";
+
+        content_string = content_string.replace(/</gm, '&lt;');
+        content_string = content_string.replace(/&nbsp;/g, ' ');
+
+        console.log("=============================")
+        console.log(content)
+        highlight_word_list.sort(function(a, b){return b.length - a.length});
+        for (const highlightWordListElement of highlight_word_list) {
+            console.log(highlightWordListElement)
+            content_string = content_string.replace(new RegExp(highlightWordListElement, 'g'), start_tag + highlightWordListElement + end_tag);
+        }
+        console.log("=============================")
+
+        // summary content_string near highlight word
+        let highlight_word_start_index = content_string.indexOf(start_tag);
+        let prev_show_words = 5;
+        let start_index = highlight_word_start_index - prev_show_words;
+        if (start_index < 0) {
+            start_index = 0;
+        }
+
+        let total_show_words = 100;
+
+        // get count of start tag occurs
+        let start_tag_count = (content_string.match(new RegExp(start_tag, 'g')) || []).length;
+        let end_tag_count = (content_string.match(new RegExp(end_tag, 'g')) || []).length;
+
+        // add words tag count
+        total_show_words += (start_tag_count * start_tag.length);
+        total_show_words += (end_tag_count * end_tag.length);
+
+        let end_index = highlight_word_start_index + total_show_words;
+        if (end_index > content_string.length) {
+            end_index = content_string.length;
+        }
+        let content_string_split = content_string.substring(start_index, end_index);
+
+        if (content_string.length < total_show_words) {
+            content_string_split = content_string;
+        }
+
+        if (url === "!NULL" && tags.includes("!AT_PHONE")) {
+            url = "tel:" + title.replace(/-/gm, '');
+        }
+
+        return `<div class="p-2 mb-2 " id="${id}-card">
+                <div class="" style="" role="link">
+                        <span class="h5">
+                            <span class="badge bg-secondary" id="${id}-badge">${badge}</span>
+                            <a id="${id}-title" href="${url}">${title}</a>
+                        </span>
+                </div>
+                <div class="text-muted" style="">
+                        <span class=""  id="${id}-date">
+                            ${get_time_string(date)}
+                        </span>
+                </div>
+                <div class="" style="" id="${id}-content">
+                    ${content_string_split}
+                </div>
+            </div>`;
+    }
+
+    function error_report(data) {
+        $("#search_list").html(`<div class="card mb-2 ">
+                <div class="hstack gap-2 mt-3" style="font-size: 1.2em;" role="button">
+                    <div class="ms-3">
+                        에러 발생
+                    </div>
+                    <div class="ms-auto me-3">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    죄송합니다. 검색결과를 가져오지 못했습니다. <br>
+                    개발자에게 자동으로 오류가 보고되었습니다. 빠른 시일 내 수정하겠습니다.<br>
+                    잠시 후 다시 시도해 주세요.
+                </div>
+            </div>`);
+
+        let text = `search error! ${localStorage.getItem("login_id")} ${get_query()} ${data}`;
+        if (localStorage.getItem("login_id") && localStorage.getItem("password")) {
             $.ajax({
-                url: "/7qy38tiejfkdnojiwgu9eyhijdfk",
+                method: "POST",
+                url: "/report/",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    std_id: localStorage.getItem("login_id"),
+                    password: localStorage.getItem("password"),
+                    type: 0,
+                    data: text,
+                    account_register: false
+                }),
                 success: function (data) {
-                    console.log("Hello api server!")
-                    SERVER_ADDRESS = "/"
-                    resolve()
+
                 },
-                error: function (xhr, status, err) {
-                    resolve()
-                },
-                timeout: 500
             });
-        })
+        }
     }
 
-    function classroom_data(push, data) {
-        let type = 0
-        if (push) {
-            type = 1
-        }
-        if (!data) {
-            data = ""
-        }
+    function get_query() {
+        return JSON.stringify({
+            "count": 30,
+            "query": $("#search_input").val(),
+            "date_from_days": 180,
+            "article_type": [
+                "!AT_HAKSA",
+                "!AT_PHONE"
+            ]
+        });
+    }
 
+    function get_search_result() {
         return new Promise(function (resolve, reject) {
-            if (localStorage.getItem("login_id") && localStorage.getItem("password")) {
                 $.ajax({
                     method: "POST",
-                    url: SERVER_ADDRESS + "account/action",
+                    url: "https://search.api.miscthings.net/search",
                     contentType: "application/json; charset=utf-8",
-                    data: JSON.stringify({
-                        std_id: localStorage.getItem("login_id"),
-                        password: localStorage.getItem("password"),
-                        type: type,
-                        data: data,
-                        account_register: false
-                    }),
+                    data: get_query(),
                     success: function (data) {
-                        if (!data.success) {
-                            window.location = "login.html"
+                        let search_list = $("#search_list")
+                        search_list.empty();
+                        for (const search_result of data) {
+                            let badge = "";
+
+                            if (search_result.tag.indexOf("!AT_HAKSA") !== -1) {
+                                badge = "학사";
+                            } else if (search_result.tag.indexOf("!AT_PHONE") !== -1) {
+                                badge = "연락처";
+                            } else {
+                                badge = "일반";
+                            }
+
+                            let element = get_search_element_html(
+                                search_result.a_id,
+                                badge,
+                                search_result.title,
+                                search_result.timestamp,
+
+                                search_result.content,
+                                search_result.origin,
+
+                                search_result.highlight_words,
+
+                                search_result.tag
+                            );
+
+                            search_list.append(element);
                         }
-
-                        $(".login_id").each(function () {
-                            $(this).html(localStorage.getItem("login_id"))
-                        })
-
-                        if (data.new_token) {
-                            localStorage.setItem("password", data.new_token)
-                        }
-
-                        resolve(data.data)
+                        resolve(data)
                     },
+                    error: function (request, status, error) {
+                        console.log({status, error});
+                        error_report({status, error});
+                        reject(error)
+                    }
                 });
-            } else {
-                window.location = "login.html"
             }
-        })
+        )
     }
 
-    async function deleteclassroom(idx) {
-        if (confirm("정말 삭제하시겠습니까?")) {
-            classrooms.splice(idx, 1);
-            await classroom_data(1, JSON.stringify(classrooms));
-            await draw_classroom(classrooms);
+    $("#sch_form").on("submit", function (e) {
+        if ($("#search_input").val() === findGetParameter("q")) {
+            e.preventDefault();
+            return false;
         }
+    });
+
+    function findGetParameter(parameterName) {
+    var result = null,
+        tmp = [];
+    var items = location.search.substr(1).split("&");
+    for (var index = 0; index < items.length; index++) {
+        tmp = items[index].split("=");
+        if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
     }
-
-    async function renameclassroom(idx) {
-        let original_name = classrooms[idx].name
-        let new_name = prompt("새 이름을 입력해 주십시오.", original_name);
-        if (new_name != null) {
-            classrooms[idx].name = new_name;
-            await classroom_data(1, JSON.stringify(classrooms));
-            await draw_classroom(classrooms);
-        }
-    }
-
-
-    function draw_classroom(classrooms) {
-        // todo remove on production
-        // $("#classroom_list").empty();
-        classrooms.forEach(function (e, i) {
-            let class_name = e.name;
-            if (getByteB(class_name) > 16) {
-                let l = getByteB(class_name) % 2 === 0 ? 10 : 11
-                class_name = class_name.substring(0, l) + "..."
-            } else {
-                class_name = class_name + " 강의실"
-            }
-
-            let url = SERVER_ADDRESS + `attend_url?std_id=${localStorage.getItem("login_id")}&qr_string=${e.qr_string}`
-            $("#classroom_list").append(`<a class="card mb-2 hstack gap-2" style="font-size: 1.8em;" role="button" onclick="location.href='${url}';">
-                <div class="ms-4 mt-2 mb-2">
-                    <span>${class_name}</span>
-                </div>
-                <div class="ms-auto me-4">
-                    <i class="fa-solid fa-arrow-right"></i>
-                </div>
-            </a>`)
-            //     $("#classroom_list").append(`<div style="margin-bottom: 1em;" >
-            //     <span class="f18"><span>${e.name}</span> 강의실 <br></span>
-            //     <span class="f16">→</span>
-            //     <a class="attend_lnk f16" href="${url}">출석</a> 또는
-            //     <a id="editdig-trigger" href="#" class="f16" onclick="renameclassroom(${i})">편집</a> 또는
-            //     <a id="editdig-trigger" href="#" class="f16" onclick="deleteclassroom(${i})">삭제</a>
-            // </div>`)
-        })
-    }
+    return result;
+}
 
     $(document).ready(async function () {
         try {
-            await detect_api_server();
+            let pm = findGetParameter("q")
+            $("#search_input").val(pm);
+            await get_search_result();
         } catch (e) {
 
         }
