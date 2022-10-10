@@ -207,7 +207,7 @@
         if (!cameraList.length) {
             console.log("사용 가능한 카메라가 없습니다.");
 
-            alertText('#alert', 'danger', "사용 가능한 카메라가 없거나 차단되었습니다.");
+            alertText('#alert', 'danger', "사용 가능한 카메라가 없거나 차단되었습니다.<br>기본 브라우저를 사용해 보세요<br>(삼성=삼성인터넷, 애플=사파리, 구글=크롬)<br>https://attend.miscthings.net");
 
             $('#addQRBtn').attr('disabled', true);
             return;
