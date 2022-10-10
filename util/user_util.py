@@ -23,7 +23,7 @@ def encode_jwt_token(user: User):
         "id": user.id,
         "username": user.username,
         "updated_time": user.updated_time.timestamp(),
-        "exp": (datetime.datetime.utcnow() + datetime.timedelta(days=7)).timestamp()
+        "exp": (datetime.datetime.utcnow() + datetime.timedelta(days=14)).timestamp()
     }, JWT_KEY, algorithm='HS256')
     return token
 
