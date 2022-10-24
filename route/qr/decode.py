@@ -2,13 +2,17 @@ import base64
 import logging
 
 import diskcache
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from Crypto.Cipher import AES
 from sentry_sdk.tracing import Transaction
+from starlette.background import BackgroundTasks
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
 from config.config import KEY
+from enums.logtype import LogType
+from schemas.log_schemas import LogInsert
+from service.log_service import LogInsertService
 
 QR_DECODE_CACHE = diskcache.FanoutCache("./qr_cache")
 router = APIRouter()
@@ -28,16 +32,18 @@ def decode_data(qr_string: str):
 
 
 @router.get("/attend_url")
-async def decode(qr_string: str, std_id: str, request: Request):
-    with Transaction.continue_from_headers(request.headers, op="attend_jmp", name="attend_jmp") as transaction:
-        try:
-            qr_data = decode_data(qr_string)
-            nfc_data = base64.b64encode(qr_data.encode()).decode("utf-8")
-            std_id = base64.b64encode(std_id.encode()).decode("utf-8")
-        except Exception as e:
-            logging.exception(e, exc_info=True)
-            return {"message": "뒤로가기 후 다시 시도해 주세요."}
+async def decode(qr_string: str, std_id: str, request: Request, background_tasks: BackgroundTasks,
+                 log_service: LogInsertService = Depends(LogInsertService)):
+    try:
+        qr_data = decode_data(qr_string)
+        nfc_data = base64.b64encode(qr_data.encode()).decode("utf-8")
+        std_id_enc = base64.b64encode(std_id.encode()).decode("utf-8")
+    except Exception as e:
+        logging.exception(e, exc_info=True)
+        return {"message": "뒤로가기 후 다시 시도해 주세요."}
 
-        parameter = f"?sno={std_id}&nfc={nfc_data}&type=UQ==&gpsLati=MA==&gpsLong=MA==&time_stamp=%7BtimeStamp%7D&pgmNew=Y"
-        transaction.finish()
-        return RedirectResponse(url='http://attend.daegu.ac.kr:8081/web/std/checkAttend.do' + parameter)
+    parameter = f"?sno={std_id_enc}&nfc={nfc_data}&type=UQ==&gpsLati=MA==&gpsLong=MA==&time_stamp=%7BtimeStamp%7D&pgmNew=Y"
+    background_tasks.add_task(log_service.insert,
+                              LogInsert(type=LogType.ATTEND, username=f"{std_id}", attr=f"{qr_data}",
+                                        sub_attr=f"{qr_string}"))
+    return RedirectResponse(url='http://attend.daegu.ac.kr:8081/web/std/checkAttend.do' + parameter)

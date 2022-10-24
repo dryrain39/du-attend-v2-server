@@ -20,8 +20,11 @@ async def create_db_and_tables():
 
 
 def get_session():
+    print("session_maker")
     db = session_maker()
     try:
+        print("session_maker yield")
         yield db
     finally:
+        print("session_maker closed")
         db.close()

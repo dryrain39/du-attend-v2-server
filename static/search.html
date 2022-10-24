@@ -162,11 +162,14 @@
         let end_tag = "</b>";
 
         content_string = content_string.replace(/</gm, '&lt;');
+        content_string = content_string.replace(/\n/gm, '<br>');
         content_string = content_string.replace(/&nbsp;/g, ' ');
 
         console.log("=============================")
         console.log(content)
-        highlight_word_list.sort(function(a, b){return b.length - a.length});
+        highlight_word_list.sort(function (a, b) {
+            return b.length - a.length
+        });
         for (const highlightWordListElement of highlight_word_list) {
             console.log(highlightWordListElement)
             content_string = content_string.replace(new RegExp(highlightWordListElement, 'g'), start_tag + highlightWordListElement + end_tag);
@@ -329,15 +332,15 @@
     });
 
     function findGetParameter(parameterName) {
-    var result = null,
-        tmp = [];
-    var items = location.search.substr(1).split("&");
-    for (var index = 0; index < items.length; index++) {
-        tmp = items[index].split("=");
-        if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+        var result = null,
+            tmp = [];
+        var items = location.search.substr(1).split("&");
+        for (var index = 0; index < items.length; index++) {
+            tmp = items[index].split("=");
+            if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+        }
+        return result.replace(/%20/g, " ").replace(/[%2B|+]/g, " ");
     }
-    return result.replace(/%20/g, " ").replace(/[%2B|+]/g, " ");
-}
 
     $(document).ready(async function () {
         try {
