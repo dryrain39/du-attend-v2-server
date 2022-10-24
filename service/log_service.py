@@ -7,6 +7,7 @@ import schemas.log_schemas as schemas
 import entity.log_entity as models
 from database.db import get_session
 from entity.user_entity import User
+from enums.logtype import LogType
 from service.user_deps import get_token_from_cookie
 
 
@@ -43,6 +44,9 @@ class LogInsertService:
 
         if log_sch.username is None and self.username is not None:
             log_sch.username = self.username
+
+        if log_sch.type == LogType.VISIT and self.username is None:
+            return
 
         db_log = models.Log(
             username=log_sch.username,
