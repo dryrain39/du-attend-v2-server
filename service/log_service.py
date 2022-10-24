@@ -45,8 +45,8 @@ class LogInsertService:
         if log_sch.username is None and self.username is not None:
             log_sch.username = self.username
 
-        if log_sch.type == LogType.VISIT and self.username is None:
-            return
+        # if log_sch.type == LogType.VISIT and self.username is None:
+        #     return
 
         db_log = models.Log(
             username=log_sch.username,
