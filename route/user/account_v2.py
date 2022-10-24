@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends
 from sentry_sdk import start_transaction
 from sqlalchemy.orm import Session
 from sqlitedict import SqliteDict
+from starlette.responses import Response
 
 from VO.account_vo import ChangePasswordAction, AccountAction
 from VO.response_code import Code, MSG
@@ -63,7 +64,7 @@ async def change_password(action: ChangePasswordAction, db: Session = Depends(ge
 
 
 @router.post("/action")
-async def account(action: AccountAction, db: Session = Depends(get_session)):
+async def account(response: Response, action: AccountAction, db: Session = Depends(get_session)):
     print(action)
 
     validate_result, msg = validate(action.std_id, action.password)
@@ -159,8 +160,11 @@ async def account(action: AccountAction, db: Session = Depends(get_session)):
         expire=60 * 60 * 24
     )
 
+    new_token = encode_jwt_token(user_info)
+    response.set_cookie(key='token', value=new_token, httponly=True, secure=True)
+
     return {
         "success": True,
         "data": user_info.attend_data,
-        "new_token": encode_jwt_token(user_info)
+        "new_token": new_token
     }

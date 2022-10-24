@@ -23,7 +23,8 @@ templates = Jinja2Templates(directory="static")
 @router.get("/index.html")
 async def index_html(request: Request, background_tasks: BackgroundTasks,
                      log_service: LogInsertService = Depends(LogInsertService)):
-    background_tasks.add_task(log_service.insert, LogInsert(type=LogType.VISIT, attr="index"))
+    background_tasks.add_task(log_service.insert,
+                              LogInsert(type=LogType.VISIT, attr="index", sub_attr=f"{request.client.host}"))
     return templates.TemplateResponse("index.html", {
         "trace": "",
         "request": request
