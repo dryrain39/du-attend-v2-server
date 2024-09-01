@@ -7,7 +7,7 @@ router = APIRouter()
 
 @router.get("/")
 async def get_version():
-    version = "230312"
+    version = "240901"
     try:
         node = os.uname().nodename
     except:

@@ -47,3 +47,4 @@ sqlitedict==1.7.0
 timeflake==0.4.2
 ujson==5.4.0
 uvicorn==0.15.0
+pycryptodome==3.19.1
