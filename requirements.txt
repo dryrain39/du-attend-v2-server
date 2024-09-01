@@ -46,9 +46,5 @@ SQLAlchemy==1.4.40
 sqlalchemy-cockroachdb==1.4.3
 sqlitedict==1.7.0
 timeflake==0.4.2
-typing-extensions==3.10.0.2
-ujson==4.2.0
+ujson==5.4.0
 uvicorn==0.15.0
-watchgod==0.7
-websockets==10.0
-yarl==1.7.2
