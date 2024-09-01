@@ -1,5 +1,7 @@
 import base64
 import logging
+from datetime import datetime, timedelta
+from urllib.parse import quote
 
 import diskcache
 from fastapi import APIRouter, Depends
@@ -42,7 +44,17 @@ async def decode(qr_string: str, std_id: str, request: Request, background_tasks
         logging.exception(e, exc_info=True)
         return {"message": "뒤로가기 후 다시 시도해 주세요."}
 
-    parameter = f"?sno={std_id_enc}&nfc={nfc_data}&type=UQ==&gpsLati=MA==&gpsLong=MA==&time_stamp=%7BtimeStamp%7D&pgmNew=Y"
+    # Get the current UTC date and time
+    now_utc = datetime.utcnow()
+
+    # Convert UTC time to KST
+    now_kst = now_utc + timedelta(hours=9)
+
+    # Format the date and time to the required string format
+    formatted_date = now_kst.strftime('%Y-%m-%dT%H:%M:%S.') + f'{now_kst.microsecond // 1000:03d}Z'
+    encoded_date = quote(formatted_date)
+
+    parameter = f"?sno={std_id_enc}&nfc={nfc_data}&type=UQ%3D%3D&gpsLati=MA%3D%3D&gpsLong=MA%3D%3D&time_stamp={encoded_date}&ver=24]"
     background_tasks.add_task(log_service.insert,
                               LogInsert(type=LogType.ATTEND, username=f"{std_id}", attr=f"{qr_data}",
                                         sub_attr=f"{qr_string}"))
