@@ -9,3 +9,4 @@ promotion_db
 db
 cache
 config/root.crt
+/test_account_results.txt
