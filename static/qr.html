@@ -5,7 +5,82 @@
     <meta name="sentry-trace" content="{{ trace }}"/>
     <title>DU Attend v2.1 - 강의실 등록</title>
     {% include 'fragment/header.html' %}
-    <script src="/static/qr.js"></script>
+    <script src="/static/qr.js?22"></script>
+    <style>
+        #imagePreviewContainer {
+            position: relative;
+            margin: 1em auto;
+            max-width: 100%;
+            display: none;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            display: block;
+            margin: 0 auto;
+        }
+
+        #cropOverlay {
+            position: absolute;
+            border: 3px dashed #ff0000;
+            cursor: move;
+            background-color: rgba(255, 0, 0, 0.1);
+            touch-action: none;
+        }
+
+        .resize-handle {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border: 2px solid #ff0000;
+            border-radius: 50%;
+            touch-action: none;
+        }
+
+        .resize-handle-nw {
+            top: -15px;
+            left: -15px;
+            cursor: nw-resize;
+        }
+
+        .resize-handle-ne {
+            top: -15px;
+            right: -15px;
+            cursor: ne-resize;
+        }
+
+        .resize-handle-sw {
+            bottom: -15px;
+            left: -15px;
+            cursor: sw-resize;
+        }
+
+        .resize-handle-se {
+            bottom: -15px;
+            right: -15px;
+            cursor: se-resize;
+        }
+
+        .control-buttons {
+            margin-top: 1em;
+            text-align: center;
+        }
+
+        #scanMessage {
+            position: absolute;
+            top: 0%;
+            left: 0;
+            right: 0;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            transform: translateY(-50%);
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
@@ -17,6 +92,14 @@
         <span style="font-weight: bold" id="alert">카메라 권한을 허용해 주세요!</span>
     </div>
 
+    <!-- 이미지 로드 버튼 추가 -->
+    <div style="text-align: center; margin-bottom: 1em;">
+        <input type="file" id="imageFileInput" accept="image/*" style="display: none;">
+        <button id="loadImageButton" class="btn-outline-secondary btn" style="width: 100%; margin-bottom: 1em;">사진(갤러리)앱에서 QR
+            코드 로드
+        </button>
+    </div>
+
     <div id="CameraSelect">
 
     </div>
@@ -25,17 +108,30 @@
 
     </div>
 
+    <!-- 이미지 미리보기 영역 -->
+    <div id="imagePreviewContainer">
+        <img id="imagePreview" src="" alt="QR 코드 이미지 미리보기">
+        <div id="cropOverlay">
+            <div class="resize-handle resize-handle-nw"></div>
+            <div class="resize-handle resize-handle-ne"></div>
+            <div class="resize-handle resize-handle-sw"></div>
+            <div class="resize-handle resize-handle-se"></div>
+        </div>
+        <div id="scanMessage">영역을 조정하면 자동으로 인식합니다...</div>
+        <div class="control-buttons">
+            <button id="cancelPreview" class="btn-outline-secondary btn">취소하기</button>
+        </div>
+    </div>
+
     <div style="text-align: center; margin-bottom: 1em; display: none;" id="classRoomNameDiv">
         <span class="f18"><span id="classRoomName" style="font-weight: bold"></span> 강의실 <br>→ </span>
         <a href="#" class="f18" onclick="change_classroom_name()">이름 변경</a>
     </div>
-    <!--    <div style="width: 100%; text-align:center ;">-->
-    <!--        <input type="text" style="margin-right: auto;margin-left: auto; width: auto" placeholder="강의실 이름을 입력하세요" aria-describedby="강의실 이름을 입력하세요."-->
-    <!--               aria-labelledby="강의실 이름을 입력하세요.">-->
-    <!--    </div>-->
 
     <div>
-        <button id="save_btn" class="btn-outline-secondary btn" onclick="save()" style="width: 100%; display: none">강의실 저장</button>
+        <button id="save_btn" class="btn-outline-secondary btn" onclick="save()" style="width: 100%; display: none">강의실
+            저장
+        </button>
     </div>
 </div>
 
@@ -46,11 +142,25 @@
     let cameraList = [];
     let classroomName = "";
     let qrCodeData = "";
-    let SERVER_ADDRESS = "//attend.miscthings.net/"
+    let SERVER_ADDRESS = "//attend.miscthings.net/";
+    let selectedFile = null;
+    let cropArea = {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0
+    };
+    let isDragging = false;
+    let isResizing = false;
+    let currentResizeHandle = null;
+    let startX, startY;
+    let startLeft, startTop, startWidth, startHeight;
+    let scanTimeout = null;
+    let isScanningArea = false;
 
     function change_classroom_name() {
         classroomName = prompt("강의실 이름을 입력해주세요.", classroomName);
-        if(classroomName === null) {
+        if (classroomName === null) {
             classroomName = "";
         }
         $("#classRoomName").html(classroomName);
@@ -136,7 +246,7 @@
             return;
         }
 
-        if(classroomName === null || classroomName === undefined || classroomName === "") {
+        if (classroomName === null || classroomName === undefined || classroomName === "") {
             classroomName = "이름 없는";
         }
 
@@ -151,16 +261,243 @@
         window.location.replace("index.html");
     }
 
+    // 영역 변경 후 자동 스캔 타이머 설정
+    function scheduleAreaScan() {
+        if (scanTimeout) {
+            clearTimeout(scanTimeout);
+        }
+
+        $("#scanMessage").show();
+
+        scanTimeout = setTimeout(() => {
+            scanSelectedArea();
+        }, 500);
+    }
+
+    // 이미지 미리보기 및 영역 선택 기능 설정
+    function setupImageCropping() {
+        const overlay = document.getElementById('cropOverlay');
+        const resizeHandles = document.querySelectorAll('.resize-handle');
+
+        // 초기 크롭 영역 설정
+        function initCropArea() {
+            const img = document.getElementById('imagePreview');
+            const imgWidth = img.offsetWidth;
+            const imgHeight = img.offsetHeight;
+
+            // 초기 크롭 영역을 이미지 중앙에 위치시킴
+            const initialSize = Math.min(imgWidth, imgHeight) * 0.7;
+            cropArea = {
+                x: (imgWidth - initialSize) / 2,
+                y: (imgHeight - initialSize) / 2,
+                width: initialSize,
+                height: initialSize
+            };
+
+            updateCropOverlay();
+            scheduleAreaScan();
+        }
+
+        // 크롭 오버레이 업데이트
+        function updateCropOverlay() {
+            overlay.style.left = cropArea.x + 'px';
+            overlay.style.top = cropArea.y + 'px';
+            overlay.style.width = cropArea.width + 'px';
+            overlay.style.height = cropArea.height + 'px';
+        }
+
+        // 터치/마우스 시작 이벤트
+        function handleStart(e) {
+            e.preventDefault();
+            const touch = e.touches ? e.touches[0] : e;
+            startX = touch.clientX;
+            startY = touch.clientY;
+            startLeft = cropArea.x;
+            startTop = cropArea.y;
+            startWidth = cropArea.width;
+            startHeight = cropArea.height;
+
+            if (e.target.classList.contains('resize-handle')) {
+                isResizing = true;
+                currentResizeHandle = e.target.classList[1];
+            } else {
+                isDragging = true;
+            }
+        }
+
+        // 터치/마우스 이동 이벤트
+        function handleMove(e) {
+            if (!isDragging && !isResizing) return;
+
+            e.preventDefault();
+            const touch = e.touches ? e.touches[0] : e;
+            const dx = touch.clientX - startX;
+            const dy = touch.clientY - startY;
+            const img = document.getElementById('imagePreview');
+            const imgRect = img.getBoundingClientRect();
+
+            if (isDragging) {
+                let newX = startLeft + dx;
+                let newY = startTop + dy;
+
+                // 이미지 경계 내에 있는지 확인
+                newX = Math.max(0, Math.min(newX, imgRect.width - cropArea.width));
+                newY = Math.max(0, Math.min(newY, imgRect.height - cropArea.height));
+
+                cropArea.x = newX;
+                cropArea.y = newY;
+            } else if (isResizing) {
+                switch (currentResizeHandle) {
+                    case 'resize-handle-nw':
+                        cropArea.x = Math.max(0, Math.min(startLeft + dx, startLeft + startWidth - 50));
+                        cropArea.y = Math.max(0, Math.min(startTop + dy, startTop + startHeight - 50));
+                        cropArea.width = startWidth - (cropArea.x - startLeft);
+                        cropArea.height = startHeight - (cropArea.y - startTop);
+                        break;
+                    case 'resize-handle-ne':
+                        cropArea.y = Math.max(0, Math.min(startTop + dy, startTop + startHeight - 50));
+                        cropArea.width = Math.max(50, Math.min(startWidth + dx, imgRect.width - cropArea.x));
+                        cropArea.height = startHeight - (cropArea.y - startTop);
+                        break;
+                    case 'resize-handle-sw':
+                        cropArea.x = Math.max(0, Math.min(startLeft + dx, startLeft + startWidth - 50));
+                        cropArea.width = startWidth - (cropArea.x - startLeft);
+                        cropArea.height = Math.max(50, Math.min(startHeight + dy, imgRect.height - cropArea.y));
+                        break;
+                    case 'resize-handle-se':
+                        cropArea.width = Math.max(50, Math.min(startWidth + dx, imgRect.width - cropArea.x));
+                        cropArea.height = Math.max(50, Math.min(startHeight + dy, imgRect.height - cropArea.y));
+                        break;
+                }
+            }
+
+            updateCropOverlay();
+        }
+
+        // 터치/마우스 종료 이벤트
+        function handleEnd(e) {
+            if (isDragging || isResizing) {
+                e.preventDefault();
+                isDragging = false;
+                isResizing = false;
+                currentResizeHandle = null;
+                scheduleAreaScan();
+            }
+        }
+
+        // 터치 이벤트 리스너 등록
+        overlay.addEventListener('touchstart', handleStart);
+        overlay.addEventListener('mousedown', handleStart);
+
+        resizeHandles.forEach(handle => {
+            handle.addEventListener('touchstart', handleStart);
+            handle.addEventListener('mousedown', handleStart);
+        });
+
+        document.addEventListener('touchmove', handleMove, {passive: false});
+        document.addEventListener('mousemove', handleMove);
+
+        document.addEventListener('touchend', handleEnd);
+        document.addEventListener('mouseup', handleEnd);
+
+        // 초기 크롭 영역 설정
+        setTimeout(initCropArea, 100);
+    }
+
     $(document).ready(async function () {
         var ua = navigator.userAgent.toLowerCase(); //userAgent 값 얻기
         if (ua.indexOf('kakaotalk') > -1) {
             alert("잠깐!!!!!!!!\n카카오톡 브라우저를 사용하고 계시네요.\n카메라 지원이 안될 수 있습니다. 주소를 복사해서 기본 브라우저를 사용해주세요.\n양해해 주셔서 감사합니다.")
         }
 
+        // 이미지 로드 버튼 클릭 이벤트 설정
+        $("#loadImageButton").on("click", function () {
+            console.log("Load image button clicked");
+            $("#imageFileInput").click();
+        });
+
+        // 파일 선택 시 이미지 미리보기 처리
+        $("#imageFileInput").on("change", function (e) {
+            console.log("File selected:", e.target.files[0]?.name || "No file");
+            if (e.target.files && e.target.files[0]) {
+                selectedFile = e.target.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $("#imagePreview").attr("src", e.target.result);
+                    $("#imagePreviewContainer").show();
+                    $("#reader").hide();
+                    setupImageCropping();
+                };
+
+                reader.readAsDataURL(selectedFile);
+            }
+        });
+
+        // 취소 버튼 클릭 이벤트
+        $("#cancelPreview").on("click", function () {
+            $("#imagePreviewContainer").hide();
+            $("#reader").show();
+            $("#scanMessage").hide();
+            selectedFile = null;
+            if (scanTimeout) {
+                clearTimeout(scanTimeout);
+                scanTimeout = null;
+            }
+        });
+
         await detect_api_server();
         await classroom_data();
         await addFromQR();
-    })
+    });
+
+    // 선택한 영역의 이미지를 스캔
+    function scanSelectedArea() {
+        if (!selectedFile || isScanningArea) return;
+
+        isScanningArea = true;
+        $("#scanMessage").text("인식 중...");
+
+        const img = document.getElementById('imagePreview');
+
+        // 캔버스 생성 및 선택 영역 그리기
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = cropArea.width;
+        canvas.height = cropArea.height;
+
+        // 원본 이미지와 캔버스의 비율 계산 (이미지가 표시 크기와 다를 수 있음)
+        const scaleX = img.naturalWidth / img.offsetWidth;
+        const scaleY = img.naturalHeight / img.offsetHeight;
+
+        // 이미지에서 선택 영역만 캔버스에 그리기
+        ctx.drawImage(
+            img,
+            cropArea.x * scaleX, cropArea.y * scaleY,
+            cropArea.width * scaleX, cropArea.height * scaleY,
+            0, 0, canvas.width, canvas.height
+        );
+
+        // 캔버스 데이터를 Blob으로 변환
+        canvas.toBlob(function (blob) {
+            const croppedFile = new File([blob], "cropped-qr.jpg", {type: "image/jpeg"});
+            processImage(croppedFile, function (success) {
+                isScanningArea = false;
+
+                if (success) {
+                    $("#imagePreviewContainer").hide();
+                    $("#reader").show();
+                    $("#scanMessage").hide();
+                } else {
+                    $("#scanMessage").text("QR 코드를 찾을 수 없습니다. 영역을 조정해 보세요.");
+                    setTimeout(() => {
+                        $("#scanMessage").text("영역을 조정하면 자동으로 인식합니다...");
+                    }, 2000);
+                }
+            });
+        }, 'image/jpeg');
+    }
 
     function alertText(id, lv, text) {
         $(id).html(text)
@@ -173,7 +510,9 @@
     };
 
     function doneReadQR() {
-        $("#reader").html(`<button class="btn-outline-secondary btn" style="width: 100%;" onclick="addFromQR();">다시 인식하기</button>`)
+        $("#reader").html(`
+            <button class="btn-outline-secondary btn" style="width: 100%; margin-bottom: 1em;" onclick="addFromQR();">다시 카메라로 인식하기</button>
+        `);
     }
 
     function listCamera() {
@@ -223,7 +562,6 @@
         $("#classRoomName").html(classroomName);
 
         doneReadQR();
-        // addClassroom(result.sid, result.tid, `${result.tid} 강의실`);
     }
 
     function getCameraList() {
@@ -262,6 +600,26 @@
         return /^[0-9a-fA-F]{31,65}$/.test(data)
     }
 
+    var qrboxFunction = function (viewfinderWidth, viewfinderHeight) {
+        // Square QR Box, with size = 80% of the min edge.
+        var minEdgeSizeThreshold = 250;
+        var edgeSizePercentage = 0.75;
+        var minEdgeSize = (viewfinderWidth > viewfinderHeight) ?
+            viewfinderHeight : viewfinderWidth;
+        var qrboxEdgeSize = Math.floor(minEdgeSize * edgeSizePercentage);
+        if (qrboxEdgeSize < minEdgeSizeThreshold) {
+            if (minEdgeSize < minEdgeSizeThreshold) {
+                return {width: minEdgeSize, height: minEdgeSize};
+            } else {
+                return {
+                    width: minEdgeSizeThreshold,
+                    height: minEdgeSizeThreshold
+                };
+            }
+        }
+        return {width: qrboxEdgeSize, height: qrboxEdgeSize};
+    }
+
     function captureQRData(cid) {
         return new Promise(function (resolve, reject) {
             const html5QrCode = new Html5Qrcode("reader");
@@ -269,8 +627,8 @@
             html5QrCode.start(
                 cid,
                 {
-                    fps: 29,    // Optional frame per seconds for qr code scanning
-                    // qrbox: 250  // Optional if you want bounded box UI
+                    fps: 15,    // Optional frame per seconds for qr code scanning
+                    // qrbox: qrboxFunction,  // Optional if you want bounded box UI
                 },
                 qrCodeMessage => {
                     // do something when code is read
@@ -292,6 +650,40 @@
                     html5QrCode.stop();
                 });
         })
+    }
+
+    // 이미지에서 QR 코드 인식
+    function processImage(file, callback) {
+        const html5QrCode = new Html5Qrcode("reader");
+        current_html5QRCode = html5QrCode;
+
+        alertText('#alert', 'info', "QR코드를 인식 중입니다...");
+
+        html5QrCode.scanFile(file, true)
+            .then(qrCodeMessage => {
+                console.log("QR 코드 메시지:", qrCodeMessage);
+                if (checkQRData(qrCodeMessage)) {
+                    alertText('#alert', 'success', "QR 코드 인식이 완료되었습니다.");
+                    qrCodeData = qrCodeMessage;
+                    classroomName = qrCodeMessage.substr(0, 4);
+
+                    $("#classRoomNameDiv").show();
+                    $("#save_btn").show();
+                    $("#classRoomName").html(classroomName);
+
+                    doneReadQR();
+
+                    if (callback) callback(true);
+                } else {
+                    alertText('#alert', 'warning', "올바른 QR코드가 아닙니다.");
+                    if (callback) callback(false);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alertText('#alert', 'warning', "QR 코드 인식에 실패했습니다.");
+                if (callback) callback(false);
+            });
     }
 
     async function check_if_classroom_length_change() {
