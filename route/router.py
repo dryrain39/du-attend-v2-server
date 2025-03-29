@@ -1,13 +1,10 @@
 from fastapi import APIRouter
 
-import route.user.account as account
 import route.user.account_v2 as account_v2
 
 import route.qr.decode as qr_decode
 import route.html.html as html
 import route.user.bug_report as bug_report
-
-import route.user.user_v3 as user_v2
 
 import route.misc.version as version
 import route.misc.redirectRouter as redirect_router

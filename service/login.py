@@ -3,12 +3,10 @@ from typing import Tuple
 
 import diskcache
 from sqlalchemy.orm import Session
-from sqlitedict import SqliteDict
 
 from VO.account_vo import ChangePasswordAction, AccountAction, LoginResponse
 
 # 사용자 로그인에 필요한 데이터
-from config.config import USER_DB_PATH
 from database.db import get_session
 
 import schemas.user_schemas as schemas
@@ -16,7 +14,7 @@ import entity.user_entity as models
 import service.user_service as crud
 from util.user_util import get_user_by_jwt_token, check_password, encode_jwt_token
 
-USER_DB = SqliteDict(USER_DB_PATH, autocommit=False)
+# SqliteDict 제거하고 TOKEN_CACHE만 유지
 TOKEN_CACHE = diskcache.FanoutCache("./token_cache")
 
 

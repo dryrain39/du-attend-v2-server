@@ -2,16 +2,15 @@ import aiohttp
 import diskcache
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlitedict import SqliteDict
 from starlette.background import BackgroundTasks
 
-from config.config import TELEGRAM_BOT_TOKEN, CHANNEL_ID, USER_DB_PATH
+from config.config import TELEGRAM_BOT_TOKEN, CHANNEL_ID
 from VO.account_vo import AccountAction
 from database.db import get_session
 from service.login import login
 
 router = APIRouter()
-USER_DB = SqliteDict(USER_DB_PATH, autocommit=False)
+# SqliteDict 제거
 TOKEN_CACHE = diskcache.FanoutCache("./token_cache")
 
 

@@ -2,12 +2,10 @@ import re
 import diskcache
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlitedict import SqliteDict
 from starlette.responses import Response
 
 from VO.account_vo import ChangePasswordAction, AccountAction
 from VO.response_code import Code, MSG
-from config.config import USER_DB_PATH
 from database.db import get_session
 from schemas.cache_data import CacheData
 from util.user_util import decode_jwt_token, get_user_by_jwt_token, check_password, encode_jwt_token
@@ -16,7 +14,7 @@ import entity.user_entity as models
 import service.user_service as crud
 
 router = APIRouter()
-USER_DB = SqliteDict(USER_DB_PATH, autocommit=False)
+# SqliteDict 제거
 TOKEN_CACHE = diskcache.FanoutCache("./token_cache")
 
 

@@ -19,6 +19,7 @@
 - [Windows 환경에서 DiskCache 파일 잠금 문제](claude_log/diskcache_windows_locking.md)
 - [테스트 환경 구성 기록](claude_log/test_environment_setup.md)
 - [SQLite 스레드 간 연결 사용 문제](claude_log/sqlite_threading_issue.md)
+- [FontAwesome에서 Lucide Icons로의 마이그레이션](claude_log/fontawesome_to_lucide_migration.md)
 
 ## 작업 기록 방법
 

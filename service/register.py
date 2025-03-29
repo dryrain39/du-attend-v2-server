@@ -1,37 +1,15 @@
-import copy
-import os
 import re
-import secrets
-import shutil
 from typing import Tuple
-
-import bcrypt
 import diskcache
-from fastapi import APIRouter, Depends
-from sentry_sdk import start_transaction, start_span
+from fastapi import Depends
 from sqlalchemy.orm import Session
-from sqlitedict import SqliteDict
-from starlette.requests import Request
-from starlette.templating import Jinja2Templates
 
-from VO.account_vo import ChangePasswordAction, AccountAction, LoginResponse
-
-from VO.account_vo import ChangePasswordAction, AccountAction
+from VO.account_vo import AccountAction, LoginResponse
 from VO.response_code import Code, MSG
-from config.config import USER_DB_PATH
 from database.db import get_session
-from schemas.cache_data import CacheData
-from util.user_util import decode_jwt_token, get_user_by_jwt_token, check_password, encode_jwt_token
-import schemas.user_schemas as schemas
-import entity.user_entity as models
 import service.user_service as crud
 
-# 사용자 로그인에 필요한 데이터
-from VO.response_code import Code, MSG
-from config.config import USER_DB_PATH
-from util.user_util import hash_password
-
-USER_DB = SqliteDict(USER_DB_PATH, autocommit=False)
+# SqliteDict 제거
 TOKEN_CACHE = diskcache.FanoutCache("./token_cache")
 
 

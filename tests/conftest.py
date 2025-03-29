@@ -28,7 +28,6 @@ with patch('sqlalchemy.create_engine') as mock_create_engine:
 
     # main 앱 import
     from main import app
-    from config.config import USER_DB_PATH
 
 
 # SQLAlchemy 테스트 DB 설정
@@ -122,22 +121,16 @@ def test_token_cache():
 @pytest.fixture(scope="function")
 def client(test_db, test_user_db, test_token_cache):
     # 원본 경로 백업
-    original_user_db_path = USER_DB_PATH
-
     # SqliteDict 및 DiskCache 패치를 위한 import
     import service.login
     import route.user.account_v2
 
     # 원본 객체 백업
-    original_login_user_db = service.login.USER_DB
     original_login_token_cache = service.login.TOKEN_CACHE
-    original_account_user_db = route.user.account_v2.USER_DB
     original_account_token_cache = route.user.account_v2.TOKEN_CACHE
 
     # 테스트 객체로 교체
-    service.login.USER_DB = test_user_db
     service.login.TOKEN_CACHE = test_token_cache
-    route.user.account_v2.USER_DB = test_user_db
     route.user.account_v2.TOKEN_CACHE = test_token_cache
 
     # 테스트 클라이언트 생성
@@ -145,7 +138,5 @@ def client(test_db, test_user_db, test_token_cache):
         yield client
 
     # 원래 객체로 복원
-    service.login.USER_DB = original_login_user_db
     service.login.TOKEN_CACHE = original_login_token_cache
-    route.user.account_v2.USER_DB = original_account_user_db
     route.user.account_v2.TOKEN_CACHE = original_account_token_cache
