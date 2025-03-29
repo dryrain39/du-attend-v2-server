@@ -15,6 +15,7 @@
 ## 현재 기록된 작업
 
 - [SqliteDict 제거 계획](claude_log/sqlitedict_removal_plan.md)
+- [SqliteDict 제거 완료](claude_log/sqlitedict_removal_complete.md)
 - [SQLite와 SQLAlchemy 호환성 문제](claude_log/sqlite_sqlalchemy_compatibility.md)
 - [Windows 환경에서 DiskCache 파일 잠금 문제](claude_log/diskcache_windows_locking.md)
 - [테스트 환경 구성 기록](claude_log/test_environment_setup.md)

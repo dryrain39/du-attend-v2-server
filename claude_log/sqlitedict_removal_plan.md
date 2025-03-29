@@ -1,4 +1,4 @@
-# SqliteDict 제거 계획 작업 기록
+# SqliteDict 제거 작업 기록
 
 ## 목표
 현재 프로젝트에서 SqliteDict 라이브러리를 제거하고 SQLAlchemy로 모든 데이터 접근을 통합하는 작업
@@ -31,12 +31,15 @@
 - 테스트 환경에서 실제 CockroachDB 연결 방지
 - 테스트 실행 환경 구성 (pytest.ini, conftest.py 등)
 - 테스트 URL 경로 수정
+- SqliteDict를 SQLAlchemy로 대체하는 코드 작성 완료
+- SqliteDict 관련 import 및 초기화 코드 제거
+- USER_DB 변수 제거 및 관련 코드 제거
+- 모든 데이터 접근을 SQLAlchemy를 통해 수행하도록 수정
+- config/config.py에서 USER_DB_PATH 제거
+- TOKEN_CACHE(DiskCache)는 그대로 유지
 
 ### 5. 남은 작업
 - DiskCache 파일 정리 문제 해결
-- SqliteDict를 SQLAlchemy로 대체하는 실제 코드 작성
-- 전체 테스트 실행 및 검증
-- 데이터 마이그레이션 실행
 
 ## 고려해볼 솔루션
 Windows 환경에서 DiskCache 파일 잠금 문제를 해결하기 위한 접근법:
@@ -45,3 +48,6 @@ Windows 환경에서 DiskCache 파일 잠금 문제를 해결하기 위한 접�
 3. 테스트 종료 후 일괄 정리
 4. 파일 삭제 재시도 로직 구현
 5. send2trash 패키지 사용
+
+## 결과
+SqliteDict 제거 작업 완료. SqliteDict를 사용하던 모든 코드가 SQLAlchemy로 대체되었습니다. 마이그레이션은 필요하지 않은 것으로 판단됨.

@@ -10,6 +10,15 @@
         .mt-1 {
             margin-top: 1em;
         }
+        .classroom-card:hover {
+            background-color: rgba(0,0,0,0.03);
+        }
+        .classroom-action {
+            cursor: pointer;
+        }
+        .classroom-action:hover {
+            color: #0d6efd;
+        }
     </style>
 </head>
 <body>
@@ -223,6 +232,33 @@
         }
     }
 
+    async function moveClassroom(idx, direction) {
+        if (await check_if_classroom_length_change()) {
+            alert("다른 기기에서 정보 변경이 감지되었습니다. 다시 시도해 주십시오.");
+            return;
+        }
+
+        // 이동 방향에 따라 강의실 순서 변경
+        if (direction === 'up' && idx > 0) {
+            // 위로 이동 (배열에서 현재 항목과 이전 항목의 위치 교환)
+            const temp = classrooms[idx];
+            classrooms[idx] = classrooms[idx - 1];
+            classrooms[idx - 1] = temp;
+        } else if (direction === 'down' && idx < classrooms.length - 1) {
+            // 아래로 이동 (배열에서 현재 항목과 다음 항목의 위치 교환)
+            const temp = classrooms[idx];
+            classrooms[idx] = classrooms[idx + 1];
+            classrooms[idx + 1] = temp;
+        } else {
+            return; // 이미 맨 위 또는 맨 아래인 경우 변경하지 않음
+        }
+
+        // 서버에 변경된 순서 저장
+        await classroom_data(1, JSON.stringify(classrooms));
+        // UI 업데이트
+        await draw_classroom(classrooms);
+    }
+
     async function qrshow(idx) {
         let qrstring = classrooms[idx].qr_string
         let qrcode = $("#qrcode");
@@ -247,18 +283,32 @@
             }
 
             let url = SERVER_ADDRESS + `attend_url?std_id=${localStorage.getItem("login_id")}&qr_string=${e.qr_string}`
-            $("#classroom_list").append(`<div class="card mb-2 hstack gap-3" style="font-size: 1.2em;" role="button">
+            
+            // 순서 변경 버튼을 포함한 강의실 카드 생성
+            const isFirst = i === 0;
+            const isLast = i === classrooms.length - 1;
+            
+            $("#classroom_list").append(`
+            <div class="card mb-2 hstack gap-3 classroom-card" style="font-size: 1.2em;">
                 <div class="ms-3 mt-2 mb-2">
                     <span>${class_name}</span>
                 </div>
-                <div class="ms-auto " onclick="qrshow(${i})">
-                    <i data-lucide="qr-code"></i>
+                <div class="ms-auto hstack gap-2">
+                    <div class="classroom-action" onclick="moveClassroom(${i}, 'up')" ${isFirst ? 'style="opacity: 0.5; cursor: default;"' : ''}>
+                        <i data-lucide="chevron-up"></i>
                     </div>
-                <div class="" onclick="renameclassroom(${i})">
-                    <i data-lucide="edit"></i>
-                </div>
-                <div class="me-3"  onclick="deleteclassroom(${i})">
-                    <i data-lucide="trash-2"></i>
+                    <div class="classroom-action" onclick="moveClassroom(${i}, 'down')" ${isLast ? 'style="opacity: 0.5; cursor: default;"' : ''}>
+                        <i data-lucide="chevron-down"></i>
+                    </div>
+                    <div class="classroom-action" onclick="qrshow(${i})">
+                        <i data-lucide="qr-code"></i>
+                    </div>
+                    <div class="classroom-action" onclick="renameclassroom(${i})">
+                        <i data-lucide="edit"></i>
+                    </div>
+                    <div class="classroom-action me-3" onclick="deleteclassroom(${i})">
+                        <i data-lucide="trash-2"></i>
+                    </div>
                 </div>
             </div>`)
             lucide.createIcons({
@@ -267,13 +317,6 @@
                     'vertical-align': '-0.125em' // 수직 정렬 조정
                 }
             });
-            //     $("#classroom_list").append(`<div style="margin-bottom: 1em;" >
-            //     <span class="f18"><span>${e.name}</span> 강의실 <br></span>
-            //     <span class="f16">→</span>
-            //     <a class="attend_lnk f16" href="${url}">출석</a> 또는
-            //     <a id="editdig-trigger" href="#" class="f16" onclick="renameclassroom(${i})">편집</a> 또는
-            //     <a id="editdig-trigger" href="#" class="f16" onclick="deleteclassroom(${i})">삭제</a>
-            // </div>`)
         })
     }
 
