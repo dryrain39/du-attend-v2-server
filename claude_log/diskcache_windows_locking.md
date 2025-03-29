@@ -3,7 +3,7 @@
 ## 발생 상황
 테스트 종료 시 다음과 같은 오류 발생:
 ```
-PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다: 'C:\\Users\\dryrain\\AppData\\Local\\Temp\\tmpjq4265en\\005\\cache.db'
+PermissionError: [WinError 32] 다른 프로세스가 파일을 사용 중이기 때문에 프로세스가 액세스 할 수 없습니다: 'C:\\Users\\~\\AppData\\Local\\Temp\\tmpjq4265en\\005\\cache.db'
 ```
 
 ## 원인

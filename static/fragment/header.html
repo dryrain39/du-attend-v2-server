@@ -13,21 +13,45 @@
 <link rel="stylesheet" href="/static/css/bootstrap.css">
 <link rel="stylesheet" type="text/css"
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css"/>
-<script src="https://kit.fontawesome.com/3694f6fd31.js" crossorigin="anonymous"></script>
+<!--<script src="https://kit.fontawesome.com/3694f6fd31.js" crossorigin="anonymous"></script>-->
 <script src="/static/js/jquery.js"></script>
 <script src="/static/js/bootstrap.min.js"></script>
 <script src="/static/sentry.min.js"></script>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-W60L1V7RMC"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
 <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
     gtag('js', new Date());
     gtag('config', 'G-W60L1V7RMC');
+
+    document.addEventListener('DOMContentLoaded', function () {
+        lucide.createIcons({
+            attrs: {
+                'stroke-width': 1.5,
+                'vertical-align': '-0.125em' // 수직 정렬 조정
+            }
+        });
+    });
 </script>
 <style>
     body {
-        font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+        font-family: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    }
+
+    [data-lucide] {
+        /*vertical-align: -0.125em; !* 또는 middle, text-bottom 등 필요에 따라 조정 *!*/
+        vertical-align: text-bottom; /* 또는 middle, text-bottom 등 필요에 따라 조정 */
+    }
+    
+    .copyleft [data-lucide] {
+        width: 14px;
+        height: 14px;
     }
 
     .f18 {

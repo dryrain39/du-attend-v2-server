@@ -28,9 +28,9 @@
                 <input type="text" class="form-control" placeholder="무엇이든 찾아보세요" aria-label="검색창" name="q"
                        aria-describedby="search_btn">
                 <button class="btn btn-outline-secondary" type="button" id="clear_btn" aria-label="초기화"><i
-                        class="fa-solid fa-times"></i></button>
+                        data-lucide="x"></i></button>
                 <button class="btn btn-outline-success" type="submit" id="search_btn" aria-label="검색"><i
-                        class="fa-solid fa-magnifying-glass"></i></button>
+                        data-lucide="search"></i></button>
             </div>
         </form>
     </div>
@@ -56,6 +56,7 @@
         </div>
     </div>
 
+
     <main role="main">
         <div style="margin-top: 1em;">
 
@@ -76,7 +77,7 @@
             <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(176,196,222,0.15)"
                  onclick="location.href='qr.html'" role="button">
                 <div class="ms-4 mt-2 mb-2">
-                    <span><i class="fa-solid fa-plus"></i>&nbsp; 강의실 추가</span>
+                    <span><i data-lucide="plus"></i>&nbsp; 강의실 추가</span>
                 </div>
                 <!--                <div class="ms-auto me-4">-->
                 <!--                    <i class="fa-solid fa-plus"></i>-->
@@ -86,7 +87,7 @@
             <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(176,196,222,0.15)"
                  onclick="location.href='baroqr.html'" role="button">
                 <div class="ms-4 mt-2 mb-2">
-                    <span><i class="fa-solid fa-qrcode"></i>&nbsp; 바로출석</span>
+                    <span><i data-lucide="qr-code"></i>&nbsp; 바로출석</span>
                 </div>
                 <!--                <div class="ms-auto me-4">-->
                 <!--                    <i class="fa-solid fa-qrcode"></i>-->
@@ -96,7 +97,7 @@
             <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(176,196,222,0.15)"
                  onclick="location.href='user.html'" role="button">
                 <div class="ms-4 mt-2 mb-2">
-                    <span><i class="fa-solid fa-gear"></i>&nbsp; 강의실 편집·사용자 설정</span>
+                    <span><i data-lucide="settings"></i>&nbsp; 강의실 편집·사용자 설정</span>
                 </div>
                 <!--                <div class="ms-auto me-4">-->
                 <!--                    <i class="fa-solid fa-gear"></i>-->
@@ -106,21 +107,21 @@
             <div class="card mb-2 mt-3 hstack gap-2" style="font-size: 1.4em; background-color: rgba(222,176,187,0.1)"
                  onclick="location.href='report.html'" role="button">
                 <div class="ms-4 mt-2 mb-2">
-                    <span><i class="fa-solid fa-bullhorn"></i>&nbsp; 의견·도움요청</span>
+                    <span><i data-lucide="megaphone"></i>&nbsp; 의견·도움요청</span>
                 </div>
             </div>
 
             <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(222,176,187,0.1)"
                  onclick="location.href='introduce.html'" role="button">
                 <div class="ms-4 mt-2 mb-2">
-                    <span><i class="fa-regular fa-circle-question"></i>&nbsp; 사용법</span>
+                    <span><i data-lucide="help-circle"></i>&nbsp; 사용법</span>
                 </div>
             </div>
 
             <div class="card mb-2 hstack gap-2" style="font-size: 1.4em; background-color: rgba(222,176,187,0.1)"
                  onclick="location.href='/out/menu/miscthings_net/https://miscthings.net'" role="button">
                 <div class="ms-4 mt-2 mb-2">
-                    <span><i class="fa-solid fa-people-group"></i>&nbsp; MiscThings 소개</span>
+                    <span><i data-lucide="users"></i>&nbsp; MiscThings 소개</span>
                 </div>
             </div>
 
@@ -132,8 +133,8 @@
 
 {% include 'fragment/footer.html' %}
 
-
 <script>
+
     let SERVER_ADDRESS = "//attend.miscthings.net/"
     let classrooms = [];
 
@@ -243,7 +244,7 @@
                     <span>${class_name}</span>
                 </div>
                 <div class="ms-auto me-4">
-                    <i class="fa-solid fa-arrow-right"></i>
+                    <i data-lucide="arrow-right"></i>
                 </div>
             </div>`)
             //     $("#classroom_list").append(`<div style="margin-bottom: 1em;" >

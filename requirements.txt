@@ -11,7 +11,7 @@ psycopg2-binary
 python-dotenv==0.19.1
 python-jose==3.4.0
 requests==2.32.0
-sentry-sdk==2.8.0
+sentry-sdk==2.24.1
 SQLAlchemy==1.4.40
 sqlalchemy-cockroachdb==1.4.3
 sqlitedict==1.7.0

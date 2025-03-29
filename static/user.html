@@ -92,17 +92,17 @@
 
 <!-- Modal -->
 <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modal_class_name">Modal title</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" style="text-align: center">
-        <div id="qrcode" style="width: 100%;"></div>
-      </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_class_name">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="text-align: center">
+                <div id="qrcode" style="width: 100%;"></div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 {% include 'fragment/footer.html' %}
@@ -186,7 +186,7 @@
         })
     }
 
-    async function check_if_classroom_length_change(){
+    async function check_if_classroom_length_change() {
         let len = classrooms.length;
         await update_classroom();
         return len !== classrooms.length
@@ -195,7 +195,7 @@
     async function deleteclassroom(idx) {
         if (confirm("정말 삭제하시겠습니까?")) {
 
-            if(await check_if_classroom_length_change()) {
+            if (await check_if_classroom_length_change()) {
                 alert("다른 기기에서 정보 변경이 감지되었습니다. 다시 시도해 주십시오.")
                 return
             }
@@ -207,10 +207,10 @@
     }
 
     async function renameclassroom(idx) {
-        let original_name = classrooms[idx].name? classrooms[idx].name : "이름 없는";
+        let original_name = classrooms[idx].name ? classrooms[idx].name : "이름 없는";
         let new_name = prompt("새 이름을 입력해 주십시오.", original_name);
         if (new_name != null) {
-            if(await check_if_classroom_length_change()) {
+            if (await check_if_classroom_length_change()) {
                 alert("다른 기기에서 정보 변경이 감지되었습니다. 다시 시도해 주십시오.")
                 return
             }
@@ -238,7 +238,7 @@
         $("#classroom_list").empty();
         classrooms.forEach(function (e, i) {
             let class_name = e.name;
-            class_name = class_name? class_name.replaceAll("<", "＜").replaceAll(">", "＞") : "이름 없는"
+            class_name = class_name ? class_name.replaceAll("<", "＜").replaceAll(">", "＞") : "이름 없는"
             if (getByteB(class_name) > 16) {
                 let l = getByteB(class_name) % 2 === 0 ? 10 : 11
                 class_name = class_name.substring(0, l) + "..."
@@ -252,15 +252,21 @@
                     <span>${class_name}</span>
                 </div>
                 <div class="ms-auto " onclick="qrshow(${i})">
-                    <i class="fa-solid fa-qrcode"></i>
+                    <i data-lucide="qr-code"></i>
                     </div>
                 <div class="" onclick="renameclassroom(${i})">
-                    <i class="fa-solid fa-pen-to-square"></i>
+                    <i data-lucide="edit"></i>
                 </div>
                 <div class="me-3"  onclick="deleteclassroom(${i})">
-                    <i class="fa-solid fa-trash"></i>
+                    <i data-lucide="trash-2"></i>
                 </div>
             </div>`)
+            lucide.createIcons({
+                attrs: {
+                    'stroke-width': 1.5,
+                    'vertical-align': '-0.125em' // 수직 정렬 조정
+                }
+            });
             //     $("#classroom_list").append(`<div style="margin-bottom: 1em;" >
             //     <span class="f18"><span>${e.name}</span> 강의실 <br></span>
             //     <span class="f16">→</span>
@@ -337,7 +343,7 @@
         update_classroom();
     })
 
-    async function update_classroom(){
+    async function update_classroom() {
         classrooms = await classroom_data();
         try {
             classrooms = JSON.parse(classrooms);
