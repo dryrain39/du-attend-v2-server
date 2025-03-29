@@ -13,7 +13,6 @@ import route.misc.version as version
 import route.misc.redirectRouter as redirect_router
 import route.misc.outlink_router as outlink_router
 
-import route.promotion.promotion_22_04 as promotion_22_04
 
 api_router = APIRouter()
 
@@ -28,5 +27,3 @@ api_router.include_router(version.router, prefix='/version', tags=['version'])
 
 api_router.include_router(outlink_router.router, prefix='/out', tags=['out'])
 
-
-api_router.include_router(redirect_router.router, prefix='/2204', tags=['promotion'])

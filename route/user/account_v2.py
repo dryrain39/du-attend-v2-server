@@ -1,11 +1,6 @@
-import copy
 import re
-import secrets
-
-import bcrypt
 import diskcache
 from fastapi import APIRouter, Depends
-from sentry_sdk import start_transaction
 from sqlalchemy.orm import Session
 from sqlitedict import SqliteDict
 from starlette.responses import Response

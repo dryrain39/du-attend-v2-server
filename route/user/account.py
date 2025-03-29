@@ -5,7 +5,6 @@ import secrets
 import bcrypt
 import diskcache
 from fastapi import APIRouter
-from sentry_sdk import start_transaction
 from sqlitedict import SqliteDict
 
 from VO.account_vo import ChangePasswordAction, AccountAction

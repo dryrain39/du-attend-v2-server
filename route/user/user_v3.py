@@ -1,9 +1,4 @@
-import aiohttp
-import diskcache
 from fastapi import APIRouter
-from sqlitedict import SqliteDict
-from starlette.background import BackgroundTasks
-from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
