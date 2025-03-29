@@ -1,5 +1,6 @@
 import logging
 import logging
+import os
 
 import uvicorn
 
@@ -60,8 +61,10 @@ async def server_checker():
 
 @app.on_event("startup")
 async def on_startup():
-    # Not needed if you setup a migration system like Alembic
-    await create_db_and_tables()
+    # 테스트 모드에서는 실제 DB 초기화를 건너뜀
+    if os.environ.get("TESTING") != "1":
+        # Not needed if you setup a migration system like Alembic
+        await create_db_and_tables()
 
 
 @app.get("/")
