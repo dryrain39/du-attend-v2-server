@@ -1,4 +1,4 @@
-FROM python:3.8-alpine
+FROM 3.9-alpine
 
 # install build-base(gcc) for uvicorn
 
