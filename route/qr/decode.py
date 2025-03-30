@@ -54,7 +54,7 @@ async def decode(qr_string: str, std_id: str, request: Request, background_tasks
     formatted_date = now_kst.strftime('%Y-%m-%dT%H:%M:%S.') + f'{now_kst.microsecond // 1000:03d}Z'
     encoded_date = quote(formatted_date)
 
-    parameter = f"?sno={std_id_enc}&nfc={nfc_data}&type=UQ%3D%3D&gpsLati=MA%3D%3D&gpsLong=MA%3D%3D&time_stamp={encoded_date}&ver=24]"
+    parameter = f"?sno={std_id_enc}&nfc={nfc_data}&type=UQ%3D%3D&gpsLati=MA%3D%3D&gpsLong=MA%3D%3D&time_stamp={encoded_date}&ver=24"
     background_tasks.add_task(log_service.insert,
                               LogInsert(type=LogType.ATTEND, username=f"{std_id}", attr=f"{qr_data}",
                                         sub_attr=f"{qr_string}"))
