@@ -58,4 +58,4 @@ async def decode(qr_string: str, std_id: str, request: Request, background_tasks
     background_tasks.add_task(log_service.insert,
                               LogInsert(type=LogType.ATTEND, username=f"{std_id}", attr=f"{qr_data}",
                                         sub_attr=f"{qr_string}"))
-    return RedirectResponse(url='http://attend.daegu.ac.kr:8081/web/std/checkAttend.do' + parameter)
+    return RedirectResponse(url='https://attend.daegu.ac.kr:8082/web/std/checkAttend.do' + parameter)
