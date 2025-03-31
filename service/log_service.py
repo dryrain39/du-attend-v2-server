@@ -55,9 +55,9 @@ class LogInsertService:
             attr=log_sch.attr,
             sub_attr=log_sch.sub_attr
         )
-        db.add(db_log)
-        db.commit()
-        db.refresh(db_log)
+        #db.add(db_log)
+        #db.commit()
+        #db.refresh(db_log)
         return db_log
 
     def close(self):
