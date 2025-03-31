@@ -15,6 +15,14 @@
     </div>
 </div>
 <div class="card mb-2 hstack gap-2" style="font-size: 1.2em; background-color: rgba(211,211,211,0.47)" role="button"
+     onclick="n3();">
+    <div class="ms-4 mt-2 mb-2">
+        <span>[안내] 3/31 DB접속지연</span>
+    </div>
+    <div class="ms-auto me-4">
+    </div>
+</div>
+<div class="card mb-2 hstack gap-2" style="font-size: 1.2em; background-color: rgba(211,211,211,0.47)" role="button"
      onclick="n2();">
     <div class="ms-4 mt-2 mb-2">
         <span>DU Attend를 추천해주세요!</span>
@@ -35,6 +43,20 @@
 <!--</div>-->
 
 <script>
+
+     function n3() {
+        let t = `[안내] 3/31 DB접속지연`;
+        let m = `
+        안녕하세요, DU Attend를 이용해 주셔서 감사합니다.<br><br>
+        
+        3/31 발생한 DB 접속 지연문제에 대해 조사중입니다.<br>
+        긴급 조치 하였으며 원인 파악후 수정하겠습니다.<br>
+        <br>
+        
+        `;
+        showNotice(t, m);
+
+    }
 
     function n2() {
         let t = `DU Attend를 추천해주세요!`;
