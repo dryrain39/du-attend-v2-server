@@ -41,11 +41,11 @@ COPY --from=builder /app /app
 # 불필요한 헤더·컴파일러 패키지 제거
 RUN apk del --no-network .build-deps || true
 
+# sh 스크립트 실행 권한 부여
+RUN chmod +x /app/entry.sh
+
 # 권한 분리 (선택)
 RUN adduser -D -u 10001 appuser
 USER appuser
-
-# sh 스크립트 실행 권한 부여
-RUN chmod +x /app/entry.sh
 
 ENTRYPOINT ["uv", "run", "/app/entry.sh"]
