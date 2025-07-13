@@ -1,7 +1,8 @@
 version: "3.7"
 services:
   attend:
-    image: a2345978/du-attend-v2-server:latest
+    image: ghcr.io/dryrain39/du-attend-v2-server:latest
+    platform: ${DOCKER_PLATFORM:-linux/amd64}
 #    build: .
     ports:
      - "20003:8000"
