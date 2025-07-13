@@ -5,7 +5,7 @@ services:
     platform: ${DOCKER_PLATFORM:-linux/amd64}
 #    build: .
     ports:
-     - "20003:8000"
+     - "${SERVER_OPEN_PORT:-20003}:8000"
     volumes:
       - ./db/promotion:/app/promotion_db/
       - ./db/user:/app/user_db/
