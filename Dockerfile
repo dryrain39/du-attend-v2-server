@@ -45,4 +45,7 @@ RUN apk del --no-network .build-deps || true
 RUN adduser -D -u 10001 appuser
 USER appuser
 
+# sh 스크립트 실행 권한 부여
+RUN chmod +x /app/entry.sh
+
 ENTRYPOINT ["uv", "run", "/app/entry.sh"]
