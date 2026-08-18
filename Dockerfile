@@ -48,4 +48,7 @@ RUN chmod +x /app/entry.sh
 RUN adduser -D -u 10001 appuser
 USER appuser
 
-ENTRYPOINT ["sh", "-c", "mkdir -p \"$HOME/.postgresql\" && cp /app/config/root.crt \"$HOME/.postgresql/\" && exec uvicorn main:app --host 0.0.0.0 --port 8000 --workers 16 --proxy-headers --forwarded-allow-ips='*'"]
+ENV PATH="/app/.venv/bin:$PATH"
+ENV VIRTUAL_ENV="/app/.venv"
+
+ENTRYPOINT ["sh", "-c", "mkdir -p \"$HOME/.postgresql\" && cp /app/config/root.crt \"$HOME/.postgresql/\" && exec /app/.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --workers 16 --proxy-headers --forwarded-allow-ips='*'"]
