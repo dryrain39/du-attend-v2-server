@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7          # buildx 최신 기능 사용
-FROM --platform=$BUILDPLATFORM ghcr.io/astral-sh/uv:python3.9-alpine AS builder
+FROM ghcr.io/astral-sh/uv:python3.9-alpine AS builder
 
 ENV UV_COMPILE_BYTECODE=1
 # 바이트코드 미리 컴파일로 cold-start 단축
